@@ -54,8 +54,8 @@ bindsym $mod+Shift+q kill
 
 # start dmenu (a program launcher)
 #bindsym $mod+d exec --no-startup-id dmenu_run
-#bindsym $mod+d exec "rofi -modi drun,run -show drun"
-bindsym $mod+d exec "$HOME/.config/rofi/launchers/type-7/launcher.sh"
+bindsym $mod+d exec "rofi -modi drun,run -show drun"
+# bindsym $mod+d exec "$HOME/.config/rofi/launchers/type-7/launcher.sh"
 # A more modern dmenu replacement is rofi:
 # bindcode $mod+40 exec "rofi -modi drun,run -show drun"
 # There also is i3-dmenu-desktop which only displays applications shipping a

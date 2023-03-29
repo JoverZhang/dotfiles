@@ -1,3 +1,6 @@
 [submodule "config/neovim"]
 	path = config/neovim
 	url = https://github.com/JoverZhang/neovim-config
+[submodule "h"]
+	path = h
+	url = git@github.com:JoverZhang/h.git

@@ -4,6 +4,7 @@ import os
 
 
 map = {
+  '$HOME/DotFiles/config/h_command': '$HOME/.config/h_command',
   '$HOME/DotFiles/config/i3': '$HOME/.config/i3',
   '$HOME/DotFiles/config/neovim': '$HOME/.config/nvim',
   '$HOME/DotFiles/config/proxychains': '$HOME/.config/proxychains',
@@ -18,8 +19,11 @@ def link(fm, to):
     fm = os.path.expandvars(fm)
     to = os.path.expandvars(to)
 
-    if os.path.exists(to) and os.path.samefile(fm, to):
-        print(f'SKIP: {to}')
+    if os.path.exists(to):
+        if os.path.samefile(fm, to):
+            print(f'SKIP: {to}')
+        else:
+            print(f'EXISTS: {to}')
         return
     os.system(f'ln -s {fm} {to}')
     print(f'SYNC: {to}')

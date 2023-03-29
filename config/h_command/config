@@ -1,0 +1,151 @@
+tool = fzf
+flags = --nth=1 --reverse +s --inline-info --height 35% --no-mouse
+includes = ~/.config/h_command/zc_config, ~/.config/h_command/zc_config
+
+
+# EDIT
+[000-edit-config]
+command = $EDITOR ~/.config/h_command/config
+
+[edit-i3config]
+command = $EDITOR ~/.config/i3/config
+
+[edit-tmux]
+command = $EDITOR ~/.config/tmux/tmux.conf
+
+[edit-shell_config]
+command = $EDITOR ~/.local/share/jover/shell_config.sh
+
+[edit-sshproxy]
+command = $EDITOR ~/.local/bin/sshproxy
+
+[edit-test]
+command = echo $(?word1:word1) $(?word2) $(?word3:word3)
+
+
+# GIT
+[git-proxy-on]
+command = git config --global http.proxy "socks5://localhost:8889" && git config --global https.proxy "socks5://localhost:8889"
+
+[git-proxy-off]
+command = git config --global --unset http.proxy && git config --global --unset https.proxy
+
+
+# NET
+[net-check-port]
+command = sudo lsof -i :$(?port)
+
+[net-host-ip]
+command = hostname --all-ip-addresses | tr " " "\n" | grep -v "0.0.0.0" | grep -v "127.0.0.1"
+command/darwin = ifconfig  | grep -E 'inet.[0-9]' | grep -v '127.0.0.1' | awk '{ print $2}'
+
+[net-start-http]
+command = python3 -m http.server $(?port)
+
+[net-whois-domain]
+command = /usr/bin/whois -h whois.internic.net $(?domain) | sed '/NOTICE:/q'
+
+
+# DOC
+[doc-git]
+command = cat $WS/sourcecode/github/awesome-cheatsheets/tools/git.txt | fzf --reverse
+
+[doc-gdb]
+command = cat $WS/sourcecode/github/awesome-cheatsheets/tools/gdb.txt | fzf --reverse
+
+
+# SSH
+[ssh-proxy-start]
+command = sshproxy start
+
+[ssh-proxy-ps]
+command = sshproxy ps
+
+[ssh-proxy-stop]
+command = sshproxy stop
+
+[ssh-self]
+command = ssh 127.0.0.1
+
+
+# System
+[system-proxy-enable]
+command = export HTTP_PROXY=http://127.0.0.1:8889 && export HTTPS_PROXY=http://127.0.0.1:8889
+
+[system-proxy-disable]
+command = unset HTTP_PROXY && unset HTTPS_PROXY
+
+[system-swapshow]
+command = swapon --show
+
+[system-swapon]
+command = sudo swapon ~/.local/swaps/swapfile
+
+[system-swapoff]
+command = sudo swapoff ~/.local/swaps/swapfile
+
+[system-swapon-2]
+command = sudo swapon ~/.local/swaps/swapfile2
+
+[system-swapoff-2]
+command = sudo swapoff ~/.local/swaps/swapfile2
+
+# MISC
+[misc-supervisor-reload]
+command = sudo supervisorctl reload
+
+[misc-weather]
+command = curl -s wttr.in/?n0
+
+[misc-benchmark-cpu]
+command = python3 -c "import test.pystone;print(test.pystone.pystones(500000))"
+
+[misc-benchmark-mem]
+command = dd if=/dev/zero of=/dev/null bs=1M count=32768
+
+[misc-disk-usage]
+command = df -h
+
+[misc-system-info]
+command = neofetch
+
+[misc-create-qr-code]
+command = echo '$(?content)' | curl -F-=\<- qrenco.de
+
+[misc-yay-downgrading-package]
+command = yay -U $(?see /var/cache/pacman/pkg)
+
+[misc-history]
+;command = $(omz_history | awk '{$1=""}1' | awk '!seen[$0]++' | fzf --nth 1 --inline-info)
+command = cat ~/.zsh_history | fzf --nth 1..2 --inline-info +s --reverse --tac --height 35%
+
+[misc-i3-xprop]
+command = xprop
+
+[misc-grep]
+command = rg -n --no-heading "$(?word)" "$(?path:$PWD)"
+
+
+# Device
+[device-cpu-frequency-show]
+command = cat /sys/devices/system/cpu/cpu*/cpufreq/scaling_max_freq
+
+[device-cpu-frequency-saving-mode]
+command = sudo cpupower frequency-set -u 1.6GHz
+
+[device-cpu-frequency-unlimited-mode]
+command = sudo cpupower frequency-set -u 3.2GHz
+
+[device-keyboard-laptop]
+command = setxkbmap -option && setxkbmap -option ctrl:swapcaps
+
+[device-keyboard-normal]
+command = setxkbmap -option
+
+
+# CMake
+[cmake-generate-debug]
+command = cmake -DCMAKE_BUILD_TYPE=Debug -G "Ninja" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -S ./ -B ./cmake-build-debug
+
+[cmake-build-debug]
+command = cmake --build ./cmake-build-debug --target $(?target) -- -j 12

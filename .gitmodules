@@ -21,3 +21,7 @@
 	path = config/zsh/zsh-syntax-highlighting
 	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
 	shallow = true
+[submodule "config/tmux/plugins/tmux-nova"]
+	path = config/tmux/plugins/tmux-nova
+	url = https://github.com/o0th/tmux-nova.git
+	shallow = true

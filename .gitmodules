@@ -8,7 +8,7 @@
 
 [submodule "config/neovim"]
 	path = config/neovim
-	url = https://github.com/JoverZhang/neovim-config
+	url = git@github.com:JoverZhang/neovim-config.git
 [submodule "config/zsh/oh-my-zsh"]
 	path = config/zsh/oh-my-zsh
 	url = https://github.com/ohmyzsh/ohmyzsh.git

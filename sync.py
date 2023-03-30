@@ -1,35 +1,18 @@
-#!/bin/python3
+#!/bin/python
 
 import os
 
+def sync(module):
+    print(f'SYNC: {module}')
+    os.system(f'git submodule update --recursive --remote --depth 1 {module}')
 
-map = {
-  '$HOME/DotFiles/config/h_command': '$HOME/.config/h_command',
-  '$HOME/DotFiles/config/i3': '$HOME/.config/i3',
-  '$HOME/DotFiles/config/neovim': '$HOME/.config/nvim',
-  '$HOME/DotFiles/config/picom.conf': '$HOME/.config/picom.conf',
-  '$HOME/DotFiles/config/proxychains': '$HOME/.config/proxychains',
-  '$HOME/DotFiles/config/zsh': '$HOME/.config/zsh',
-}
+modules = [
+    'config/zsh/oh-my-zsh',
+    'config/zsh/zsh-autosuggestions',
+     'config/zsh/zsh-syntax-highlighting',
+    'fzf',
+]
 
-
-def expandvars(var):
-    return os.path.expandvars(var)
-
-def link(fm, to):
-    fm = os.path.expandvars(fm)
-    to = os.path.expandvars(to)
-
-    if os.path.exists(to):
-        if os.path.samefile(fm, to):
-            print(f'SKIP: {to}')
-        else:
-            print(f'EXISTS: {to}')
-        return
-    os.system(f'ln -s {fm} {to}')
-    print(f'SYNC: {to}')
-
-
-for key in map:
-    link(key, map[key])
+for module in modules:
+    sync(module)
 

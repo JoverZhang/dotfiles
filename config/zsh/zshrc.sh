@@ -72,9 +72,11 @@ ZSH_THEME="jonathan"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git)
+plugins=(git docker)
 
 source $ZSH/oh-my-zsh.sh
+source $ZSH_ROOT/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source $ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 # User configuration
 
@@ -107,6 +109,7 @@ source $ZSH/oh-my-zsh.sh
 # Aliases
 alias p="proxychains -f $HOME/.local/share/proxychains/proxychains.conf"
 alias t='asynctask -f'
+alias docker='podman'
 
 # Environments
 export WS="$HOME/Workspace"
@@ -116,4 +119,3 @@ export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin"
 #export HTTP_PROXY=http://127.0.0.1:8889
 #export HTTPS_PROXY=http://127.0.0.1:8889
 export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
-

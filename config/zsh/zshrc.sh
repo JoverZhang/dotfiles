@@ -1,3 +1,4 @@
+export DOT_FILES="$HOME/DotFiles"
 ZSH_ROOT=$(dirname $0)
 
 # If you come from bash you might have to change your $PATH.
@@ -11,33 +12,6 @@ export ZSH="$ZSH_ROOT/oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="jonathan"
-
-##############################################################################
-
-# Aliases
-alias p="proxychains -f $HOME/.local/share/proxychains/proxychains.conf"
-alias t='asynctask -f'
-alias docker='podman'
-
-# Environments
-export WS="$HOME/Workspace"
-export DOT_FILES="$HOME/DotFiles"
-export EDITOR='/bin/nvim'
-export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin"
-
-#export HTTP_PROXY=http://127.0.0.1:8889
-#export HTTPS_PROXY=http://127.0.0.1:8889
-export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
-
-# golang
-if command -v go &>/dev/null; then
-	export GOPATH=$(go env GOPATH)
-	export PATH=$PATH:$(go env GOPATH)/bin
-else
-	echo 'command "go" could not be found'
-fi
-
-##############################################################################
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -133,7 +107,71 @@ source $DOT_FILES/fzf/shell/key-bindings.zsh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 
-###############################################################################
+##############################################################################
+
+# Aliases
+alias p="proxychains -f $HOME/.local/share/proxychains/proxychains.conf"
+alias t='asynctask -f'
+alias docker='podman'
+
+# Environments
+export WS="$HOME/Workspace"
+export EDITOR='/bin/nvim'
+export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin"
+
+#export HTTP_PROXY=http://127.0.0.1:8889
+#export HTTPS_PROXY=http://127.0.0.1:8889
+export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
+
+# golang
+if command -v go &>/dev/null; then
+	export GOPATH=$(go env GOPATH)
+	export PATH=$PATH:$(go env GOPATH)/bin
+else
+	echo 'command "go" could not be found'
+fi
+
+# fzf keymaps
+# autoload -Uz fzf-cd-widget
+# zle -N fzf-cd-widget
+# bindkey '^F' fzf-cd-widget
+
+# fshow - git commit browser
+fshow() {
+	local out sha q
+	while out=$(
+		git log --graph --color=always \
+			--format="%C(auto)%h%d %s %C(black)%C(bold)%cr" |
+			fzf --ansi --multi --no-sort --reverse --query="$q" --print-query
+	); do
+		q=$(head -1 <<<"$out")
+		while read sha; do
+			[ -n "$sha" ] && git show --color=always $sha | less -R
+		done < <(sed '1d;s/^[^a-z0-9]*//;/^$/d' <<<"$out" | awk '{print $1}')
+	done
+}
+
+fzf-ls-cd-widget() {
+	local cmd="ls -al --color=yes | sed 1,2d"
+	setopt localoptions pipefail no_aliases 2>/dev/null
+	local dir="$(eval "$cmd" | FZF_DEFAULT_OPTS="--ansi --nth=8 --height ${FZF_TMUX_HEIGHT:-40%} --reverse --bind=ctrl-z:ignore ${FZF_DEFAULT_OPTS-} ${FZF_ALT_C_OPTS-}" $(__fzfcmd) +m | awk '{ print $8 }')"
+	if [[ -z "$dir" ]]; then
+		zle redisplay
+		return 0
+	fi
+	zle push-line
+	BUFFER="builtin cd -- ${dir}"
+	zle accept-line
+	local ret=$?
+	unset dir
+	zle reset-prompt
+	return $ret
+}
+autoload -Uz fzf-ls-cd-widget
+zle -N fzf-ls-cd-widget
+bindkey '^G' fzf-ls-cd-widget
+
+##############################################################################
 
 # auto start tmux
 if command -v tmux &>/dev/null; then

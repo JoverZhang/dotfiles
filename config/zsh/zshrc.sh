@@ -151,6 +151,7 @@ fshow() {
 	done
 }
 
+# c-g
 fzf-ls-cd-widget() {
 	local cmd="ls -al --color=yes | sed 1,2d"
 	setopt localoptions pipefail no_aliases 2>/dev/null

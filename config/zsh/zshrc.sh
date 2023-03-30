@@ -12,6 +12,25 @@ export ZSH="$ZSH_ROOT/oh-my-zsh"
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="jonathan"
 
+##############################################################################
+
+# Aliases
+alias p="proxychains -f $HOME/.local/share/proxychains/proxychains.conf"
+alias t='asynctask -f'
+alias docker='podman'
+
+# Environments
+export WS="$HOME/Workspace"
+export DOT_FILES="$HOME/DotFiles"
+export EDITOR='/bin/nvim'
+export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin"
+
+#export HTTP_PROXY=http://127.0.0.1:8889
+#export HTTPS_PROXY=http://127.0.0.1:8889
+export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
+
+##############################################################################
+
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
 # a theme from this variable instead of looking in $ZSH/themes/
@@ -77,6 +96,8 @@ plugins=(git docker)
 source $ZSH/oh-my-zsh.sh
 source $ZSH_ROOT/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source $ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh
+source $DOT_FILES/fzf/shell/completion.zsh
+source $DOT_FILES/fzf/shell/key-bindings.zsh
 
 # User configuration
 
@@ -103,19 +124,3 @@ source $ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
-
-##############################################################################
-
-# Aliases
-alias p="proxychains -f $HOME/.local/share/proxychains/proxychains.conf"
-alias t='asynctask -f'
-alias docker='podman'
-
-# Environments
-export WS="$HOME/Workspace"
-export EDITOR='/bin/nvim'
-export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin"
-
-#export HTTP_PROXY=http://127.0.0.1:8889
-#export HTTPS_PROXY=http://127.0.0.1:8889
-export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16

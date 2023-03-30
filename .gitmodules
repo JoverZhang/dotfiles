@@ -25,3 +25,7 @@
 	path = config/tmux/plugins/tmux-nova
 	url = https://github.com/o0th/tmux-nova.git
 	shallow = true
+[submodule "config/tmux/plugins/tmux-resurrect"]
+	path = config/tmux/plugins/tmux-resurrect
+	url = https://github.com/tmux-plugins/tmux-resurrect
+	shallow = true

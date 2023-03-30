@@ -29,6 +29,14 @@ export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin"
 #export HTTPS_PROXY=http://127.0.0.1:8889
 export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
 
+# golang
+if command -v go &>/dev/null; then
+	export GOPATH=$(go env GOPATH)
+	export PATH=$PATH:$(go env GOPATH)/bin
+else
+	echo 'command "go" could not be found'
+fi
+
 ##############################################################################
 
 # Set list of themes to pick from when loading at random
@@ -124,3 +132,14 @@ source $DOT_FILES/fzf/shell/key-bindings.zsh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+
+###############################################################################
+
+# auto start tmux
+if command -v tmux &>/dev/null; then
+	if [ -z "$TMUX" ]; then
+		tmux
+	fi
+else
+	echo 'command "tmux" could not be found'
+fi

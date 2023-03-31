@@ -6,13 +6,15 @@ fileexplorer() {
 	while dir=$(
 		eval "$cmd" |
 			$(__fzfcmd) +m \
-				--border=top \
-				--border-label="| $PWD |" \
 				--ansi \
+				--reverse \
 				--nth=9 \
 				--height=60% \
-				--reverse \
+				--border=top \
+				--border-label="| $PWD |" \
 				--preview='if [ -f {9} ]; then bat -pn --color=always {9}; else ls -alH --color=yes {9}; fi' \
+				--color='label:#5555FF:200' \
+				\
 				--bind='change:top' \
 				--bind='focus:transform-preview-label:echo "|" {9} "|"' \
 				--bind='ctrl-f:abort' \
@@ -21,6 +23,7 @@ fileexplorer() {
 				--bind='ctrl-h:top+accept' \
 				--bind='ctrl-l:accept' \
 				--bind='ctrl-z:ignore' \
+				\
 				--header='C-h: back C-l enter' |
 			awk '{ print $9 }'
 	); do

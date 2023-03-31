@@ -1,10 +1,24 @@
 fileexplorer() {
-	local cmd="exa -bglHh --all --all --color=always | sed 1,2d"
 	setopt localoptions pipefail no_aliases 2>/dev/null
 
-	local dir
-	while dir=$(
-		eval "$cmd" |
+	local ops='9'
+	local ls_dir="exa -bglHh --all --all --color=always"
+	local cat_file="bat -pn --color=always"
+
+	local tmp='/tmp/file-explorer'
+	mkdir -p "$tmp"
+
+	# preview_window config
+	local preview_window_up='up,55%,wrap'
+	local preview_window_right='right,55%,wrap'
+	local tmp_preview_window="$tmp/preview_window"
+	if [ ! -f $tmp_preview_window ]; then
+		echo "$preview_window_right" >$tmp_preview_window
+	fi
+
+	local selected
+	while selected=$(
+		eval "$ls_dir" | sed 1,2d |
 			$(__fzfcmd) +m \
 				--ansi \
 				--reverse \
@@ -12,48 +26,52 @@ fileexplorer() {
 				--height=60% \
 				--border=top \
 				--border-label="| $PWD |" \
-				--preview='if [ -f {9} ]; then bat -pn --color=always {9}; else ls -alH --color=yes {9}; fi' \
+				--preview=" if [ -f {$ops} ]; then $cat_file {$ops}; else $ls_dir {$ops}; fi " \
+				--preview-window="$(cat $tmp_preview_window)" \
 				--color='label:#5555FF:200' \
 				\
 				--bind='change:top' \
-				--bind='focus:transform-preview-label:echo "|" {9} "|"' \
-				--bind='ctrl-f:abort' \
+				`# show "x -> y" for link file` \
+				--bind="focus:transform-preview-label( echo '|' \$( if [ ! -z {$(($ops + 1))} ]; then echo {$ops} {$(($ops + 1))} {$(($ops + 2))}; else echo {$ops}; fi ) '|' )" \
+				--bind="ctrl-s:change-preview-window(up)+execute(echo $preview_window_up>$tmp_preview_window)" \
+				--bind="ctrl-v:change-preview-window(right)+execute(echo $preview_window_right>$tmp_preview_window)" \
 				--bind='ctrl-u:preview-half-page-up' \
 				--bind='ctrl-d:preview-half-page-down' \
+				--bind='ctrl-f:abort' \
 				--bind='ctrl-h:top+accept' \
 				--bind='ctrl-l:accept' \
 				--bind='ctrl-z:ignore' \
 				\
 				--header='C-h: back C-l enter' |
-			awk '{ print $9 }'
+			awk "{ print \$$ops }"
 	); do
 		# echo 'selected: ' $dir >>$WS/test.log
 
 		# selected file
 		# push it to BUFFER
-		if [[ -f "$dir" ]]; then
+		if [[ -f "$selected" ]]; then
 			# echo 'push: ' $dir >>$WS/test.log
 			zle reset-prompt
-			BUFFER="$dir"
-			unset dir
+			BUFFER="$selected"
+			unset selected
 			return 0
 		fi
 
 		# selected directory
 		# cd to dir
 		# echo 'cd: ' $dir >>$WS/test.log
-		BUFFER="builtin cd -- ${dir}"
-		builtin cd $dir
+		BUFFER="builtin cd -- ${selected}"
+		builtin cd $selected
 		# zle accept-line
 		zle redisplay
-		unset dir
+		unset selected
 	done
 
 	# exit
 	# echo 'exit: ' $dir >>$WS/test.log
 	BUFFER=""
 	zle reset-prompt
-	unset dir
+	unset selected
 	return 0
 }
 autoload -Uz fileexplorer

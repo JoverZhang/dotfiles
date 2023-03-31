@@ -9,48 +9,48 @@ fileexplorer() {
 				--border=top \
 				--border-label="| $PWD |" \
 				--ansi \
-				--bind=change:top \
 				--nth=9 \
 				--height=60% \
 				--reverse \
 				--preview='if [ -f {9} ]; then bat -pn --color=always {9}; else ls -alH --color=yes {9}; fi' \
+				--bind='change:top' \
+				--bind='focus:transform-preview-label:echo "|" {9} "|"' \
 				--bind='ctrl-f:abort' \
 				--bind='ctrl-u:preview-half-page-up' \
 				--bind='ctrl-d:preview-half-page-down' \
 				--bind='ctrl-h:top+accept' \
 				--bind='ctrl-l:accept' \
-				--bind='ctrl-p:transform-preview-label(echo {})' \
 				--bind='ctrl-z:ignore' \
 				--header='C-h: back C-l enter' |
 			awk '{ print $9 }'
 	); do
-
-		echo 'selected: ' $dir >>$WS/test.log
+		# echo 'selected: ' $dir >>$WS/test.log
 
 		# selected file
 		# push it to BUFFER
 		if [[ -f "$dir" ]]; then
-			echo 'push: ' $dir >>$WS/test.log
-			zle redisplay
+			# echo 'push: ' $dir >>$WS/test.log
+			zle reset-prompt
 			BUFFER="$dir"
+			unset dir
 			return 0
 		fi
 
 		# selected directory
 		# cd to dir
-		echo 'cd: ' $dir >>$WS/test.log
+		# echo 'cd: ' $dir >>$WS/test.log
 		BUFFER="builtin cd -- ${dir}"
 		builtin cd $dir
-		zle accept-line
+		# zle accept-line
 		zle redisplay
-		# unset dir
+		unset dir
 	done
 
-	echo 'exit: ' $dir >>$WS/test.log
-
 	# exit
+	# echo 'exit: ' $dir >>$WS/test.log
 	BUFFER=""
-	zle redisplay
+	zle reset-prompt
+	unset dir
 	return 0
 }
 autoload -Uz fileexplorer

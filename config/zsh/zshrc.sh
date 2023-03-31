@@ -166,7 +166,7 @@ fshow() {
 fzf-ls-cd-widget() {
 	local cmd="ls -al --color=yes | sed 1,2d"
 	setopt localoptions pipefail no_aliases 2>/dev/null
-	local dir="$(eval "$cmd" | FZF_DEFAULT_OPTS="--ansi --nth=9 --height ${FZF_TMUX_HEIGHT:-50%} --reverse --preview='if [ -f {9} ]; then bat -pn --color=always {9}; else ls -alH --color=yes {9}; fi' | awk '{ print \$9 }' --bind=ctrl-z:ignore ${FZF_DEFAULT_OPTS-} ${FZF_ALT_C_OPTS-}" $(__fzfcmd) +m | awk '{ print $9 }')"
+	local dir="$(eval "$cmd" | FZF_DEFAULT_OPTS="--ansi --bind change:top --nth=9 --height ${FZF_TMUX_HEIGHT:-60%} --reverse --preview='if [ -f {9} ]; then bat -pn --color=always {9}; else ls -alH --color=yes {9}; fi' | awk '{ print \$9 }' --bind=ctrl-z:ignore ${FZF_DEFAULT_OPTS-} ${FZF_ALT_C_OPTS-}" $(__fzfcmd) +m | awk '{ print $9 }')"
 
 	# skip
 	if [[ -z "$dir" ]]; then

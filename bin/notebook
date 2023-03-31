@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd /home/jover/Workspace/obsidian/NoteBooks
+gvim
+i3-msg -s $(i3 --get-socket) '[title="GVIM$"] move scratchpad'
+i3-msg -s $(i3 --get-socket) '[title="GVIM$"] scratchpad show'
+

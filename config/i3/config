@@ -257,7 +257,8 @@ bindsym $mod+Ctrl+Escape mode "$mode_focus"
 
 # Shortcut
 bindsym $mod+Ctrl+2 exec xfce4-terminal --drop-down --title TERMINAL-DROPDOWN
-bindsym $mod+Ctrl+3 exec xfce4-popup-notes
+# bindsym $mod+Ctrl+3 exec xfce4-popup-notes
+bindsym $mod+Ctrl+3 [title="GVIM$"] scratchpad show
 bindsym $mod+Shift+s exec flameshot gui
 bindsym $sup+e exec thunar
 bindsym --release $mod+Ctrl+x exec xkill

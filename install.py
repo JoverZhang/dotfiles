@@ -9,6 +9,7 @@ map = {
     '$HOME/DotFiles/config/picom.conf': '$HOME/.config/picom.conf',
     '$HOME/DotFiles/config/proxychains': '$HOME/.config/proxychains',
     '$HOME/DotFiles/config/tmux/tmux.conf': '$HOME/.tmux.conf',
+    '$HOME/DotFiles/config/xfce4/terminal': '$HOME/.config/xfce4/terminal',
     '$HOME/DotFiles/config/zsh': '$HOME/.config/zsh',
 }
 

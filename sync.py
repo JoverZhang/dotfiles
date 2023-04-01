@@ -1,6 +1,7 @@
 #!/bin/python3
 
 import os
+import sys
 import re
 from typing import Optional
 
@@ -62,9 +63,13 @@ def sync(module: Module, skip: bool = False):
 
 
 def main():
+    all = False
+    if len(sys.argv) > 1 and sys.argv[1] == 'all':
+        all = True
+
     modules: list[Module] = load_config('$DOT_FILES/.gitmodules')
     for module in modules:
-        sync(module, not module.shallow)
+        sync(module, not all and not module.shallow)
 
 
 if __name__ == "__main__":

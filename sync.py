@@ -3,7 +3,7 @@
 import os
 import sys
 import re
-from typing import Optional
+from typing import Optional, List
 
 
 class bcolors:
@@ -26,8 +26,8 @@ class Module:
             f'shallow={self.shallow})'
 
 
-def load_config(filename) -> list[Module]:
-    modules: list[Module] = []
+def load_config(filename) -> List[Module]:
+    modules: List[Module] = []
     with open(os.path.expandvars(filename)) as f:
         if not f.readable:
             return []
@@ -67,7 +67,7 @@ def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'all':
         all = True
 
-    modules: list[Module] = load_config('$DOT_FILES/.gitmodules')
+    modules: List[Module] = load_config('$DOT_FILES/.gitmodules')
     for module in modules:
         sync(module, not all and not module.shallow)
 

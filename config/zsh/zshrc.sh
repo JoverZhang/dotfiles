@@ -90,6 +90,16 @@ source $DOT_FILES/fzf/shell/key-bindings.zsh
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
+LANG=en_US.UTF-8
+LC_ADDRESS=en_US.UTF-8
+LC_IDENTIFICATION=en_US.UTF-8
+LC_MEASUREMENT=en_US.UTF-8
+LC_MONETARY=en_US.UTF-8
+LC_NAME=en_US.UTF-8
+LC_NUMERIC=en_US.UTF-8
+LC_PAPER=en_US.UTF-8
+LC_TELEPHONE=en_US.UTF-8
+LC_TIME=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
 # if [[ -n $SSH_CONNECTION ]]; then
@@ -125,17 +135,6 @@ export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin"
 #export HTTP_PROXY=http://127.0.0.1:8889
 #export HTTPS_PROXY=http://127.0.0.1:8889
 export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
-
-LANG=en_US.UTF-8
-LC_ADDRESS=en_US.UTF-8
-LC_IDENTIFICATION=en_US.UTF-8
-LC_MEASUREMENT=en_US.UTF-8
-LC_MONETARY=en_US.UTF-8
-LC_NAME=en_US.UTF-8
-LC_NUMERIC=en_US.UTF-8
-LC_PAPER=en_US.UTF-8
-LC_TELEPHONE=en_US.UTF-8
-LC_TIME=en_US.UTF-8
 
 # golang
 if command -v go &>/dev/null; then

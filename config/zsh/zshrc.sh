@@ -144,6 +144,10 @@ if command -v go &>/dev/null; then
 else
 	echo 'command "go" could not be found'
 fi
+# npm
+if ! (command -v npm &>/dev/null); then
+	echo 'command "npm" could not be found'
+fi
 
 # fzf keymaps
 # autoload -Uz fzf-cd-widget

@@ -29,3 +29,6 @@
 	path = config/tmux/plugins/tmux-resurrect
 	url = https://github.com/tmux-plugins/tmux-resurrect
 	shallow = true
+[submodule "config/zsh/zsh-file-manager"]
+	path = config/zsh/zsh-file-manager
+	url = git@github.com:JoverZhang/zsh-file-manager.git

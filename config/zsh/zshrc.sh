@@ -203,6 +203,9 @@ fzf-ls-cd-widget() {
 
 ##############################################################################
 
+# fpath
+fpath+=~/.zfunc
+
 # auto start tmux
 if command -v tmux &>/dev/null; then
 	if [ -z "$TMUX" ]; then

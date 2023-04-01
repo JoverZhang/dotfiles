@@ -1,9 +1,9 @@
-fileexplorer() {
+file_manager() {
 	# Help Manual
 	read -r -d '' HELP <<EOF
-File-Explorer Manual
+Zsh-File-Manager Manual
 
-Base on "zsh" and "fzf", the File-Explorer is a lightweight tool that incorporates "exa" and "bat" for enhanced functionality.
+Base on "zsh" using "fzf", the File-Manager is a lightweight tool that incorporates "exa" and "bat" for enhanced functionality.
 
 Binding keys:
 
@@ -43,7 +43,7 @@ EOF
 	fi
 
 	#tmp file
-	local TMP='/tmp/file-explorer'
+	local TMP='/tmp/file-manager'
 	mkdir -p "$TMP"
 
 	# debug log
@@ -129,9 +129,9 @@ EOF
 		zle redisplay
 	done
 }
-autoload -Uz fileexplorer
-zle -N fileexplorer
-bindkey '^F' fileexplorer
+autoload -Uz file_manager
+zle -N file_manager
+bindkey '^F' file_manager
 
 # c-f
 fzf-ls-cd-widget() {

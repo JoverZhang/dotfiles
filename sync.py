@@ -67,7 +67,7 @@ def main():
     if len(sys.argv) > 1 and sys.argv[1] == 'all':
         all = True
 
-    modules: List[Module] = load_config('$DOT_FILES/.gitmodules')
+    modules: List[Module] = load_config(f'./.gitmodules')
     for module in modules:
         sync(module, not all and not module.shallow)
 

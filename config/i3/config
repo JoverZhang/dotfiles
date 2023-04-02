@@ -171,10 +171,10 @@ mode "resize" {
         bindsym Up resize shrink height 10 px or 10 ppt
         bindsym Right resize grow width 10 px or 10 ppt
 
-        bindsym Home resize shrink width 100 px or 100 ppt
-        bindsym Next resize grow height 100 px or 100 ppt
-        bindsym Prior resize shrink height 100 px or 100 ppt
-        bindsym End resize grow width 100 px or 100 ppt
+        bindsym Shift+Left resize shrink width 100 px or 100 ppt
+        bindsym Shift+Down resize grow height 100 px or 100 ppt
+        bindsym Shift+Up resize shrink height 100 px or 100 ppt
+        bindsym Shift+Right resize grow width 100 px or 100 ppt
 
         # back to normal: Enter or Escape or $mod+r
         bindsym Return mode "default"

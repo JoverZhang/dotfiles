@@ -258,7 +258,7 @@ bindsym $mod+Ctrl+Escape mode "$mode_focus"
 # Shortcut
 bindsym $mod+Ctrl+2 exec xfce4-terminal --drop-down --title TERMINAL-DROPDOWN
 # bindsym $mod+Ctrl+3 exec xfce4-popup-notes
-bindsym $mod+Ctrl+3 [title="GVIM$"] scratchpad show
+bindsym $mod+Ctrl+3 [title="^NOTE_BOOK$"] scratchpad show
 bindsym $mod+Shift+s exec flameshot gui
 bindsym $sup+e exec thunar
 bindsym --release $mod+Ctrl+x exec xkill
@@ -271,6 +271,9 @@ bindsym $mod+minus scratchpad show
 
 # Assign
 #assign [class="idea"] $ws2
+for_window [title="^NOTE_BOOK$"] enable floating
+# for_window [title="^NOTE_BOOK$"] resize set 1200 2000
+
 for_window [instance="Thunar" class="Thunar"] floating enable
 for_window [instance="viewnior" class="Viewnior"] floating enable
 for_window [instance="JetBrains Toolbox" class="jetbrains-toolbox"] floating disable

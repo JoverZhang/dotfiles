@@ -63,6 +63,10 @@ set clipboard=unnamedplus
 " markdown
 autocmd bufreadpre *.md set conceallevel=2
 
+" format fmtmd (clear newline and copy for translate software)
+autocmd BufNewFile,BufRead *.fmtmd set filetype=fmtmd
+autocmd FileType fmtmd nmap <C-f> :%s/\n/ / \| nohlsearch \| w \| yank<CR>
+
 " keybindings
 let mapleader = " "
 nmap <leader>e :Explore<CR>

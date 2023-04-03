@@ -65,11 +65,24 @@ autocmd bufreadpre *.md set conceallevel=2
 
 " format fmtmd (clear newline and copy for translate software)
 autocmd BufNewFile,BufRead *.fmtmd set filetype=fmtmd
-autocmd FileType fmtmd nmap <C-f> :%s/\n/ / \| nohlsearch \| w \| yank<CR>
+autocmd FileType fmtmd nmap <C-f> :%s/\n/ / \| nohlsearch \| yank<CR>
 
 " keybindings
 let mapleader = " "
 nmap <leader>e :Explore<CR>
 nmap <C-s> :w<CR>
 imap <C-s> <esc>:w<CR>
+
+map <silent> <Up> gk
+imap <silent> <Up> <C-o>gk
+map <silent> <Down> gj
+imap <silent> <Down> <C-o>gj
+map <silent> <home> g<home>
+map <silent> <End> g<End>
+map <silent> j gj
+map <silent> k gk
+
+setlocal linebreak
+setlocal nolist
+setlocal display+=lastline
 

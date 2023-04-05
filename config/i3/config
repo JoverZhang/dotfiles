@@ -247,7 +247,7 @@ bindsym $mod+Ctrl+Delete mode "$mode_system"
 
 
 # focus mode
-set $mode_focus [Focus Mode]
+set $mode_focus [ Locked ]
 mode "$mode_focus" {
     bindsym $mod+Ctrl+Escape mode "default"
 }

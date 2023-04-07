@@ -59,6 +59,7 @@ endif
 set number
 set autoindent expandtab tabstop=2 shiftwidth=2
 set clipboard=unnamedplus
+set sms " smoothscroll
 
 " markdown
 autocmd bufreadpre *.md set conceallevel=2
@@ -79,8 +80,8 @@ map <silent> <Down> gj
 imap <silent> <Down> <C-o>gj
 map <silent> <home> g<home>
 map <silent> <End> g<End>
-map <silent> j gj
-map <silent> k gk
+nnoremap <expr> j (v:count == 0 ? 'gj' : 'j')
+nnoremap <expr> k (v:count == 0 ? 'gk' : 'k')
 
 setlocal linebreak
 setlocal nolist

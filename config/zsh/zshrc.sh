@@ -130,7 +130,7 @@ alias docker='podman'
 # Environments
 export WS="$HOME/Workspace"
 export EDITOR='/bin/nvim'
-export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin"
+export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin:$HOME/.cargo/bin"
 
 #export HTTP_PROXY=http://127.0.0.1:8889
 #export HTTPS_PROXY=http://127.0.0.1:8889

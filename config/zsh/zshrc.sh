@@ -138,6 +138,7 @@ export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
 
 # golang
 if command -v go &>/dev/null; then
+	export GOROOT=$(go env GOROOT)
 	export GOPATH=$(go env GOPATH)
 	export PATH=$PATH:$(go env GOPATH)/bin
 else

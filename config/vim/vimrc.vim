@@ -8,6 +8,18 @@ endif
 " vim-plug
 call plug#begin()
 
+" airline
+Plug 'vim-airline/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+let g:airline_theme='simple'
+let g:airline_powerline_fonts = 1
+let g:airline#extensions#tabline#enabled = 1
+let g:airline#extensions#wordcount#filetypes =
+    \ ['asciidoc', 'help', 'mail', 'markdown', 'fmtmd', 'rmd',
+    \ 'nroff', 'org', 'plaintex', 'rst', 'tex', 'text']
+let g:airline#extensions#wordcount#formatter = 'hans'
+
+" vim-easy-align
 Plug 'junegunn/vim-easy-align'
 
 " markdown
@@ -70,10 +82,11 @@ autocmd FileType fmtmd nmap <C-f> :%s/\n/ / \| nohlsearch \| yank<CR>
 
 " keybindings
 let mapleader = " "
-nmap <leader>e :Explore<CR>
-nmap <C-s> :w<CR>
-imap <C-s> <esc>:w<CR>
-
+" direction
+nmap <C-h> <C-w>h
+nmap <C-l> <C-w>l
+nmap <C-j> <C-w>j
+nmap <C-k> <C-w>k
 map <silent> <Up> gk
 imap <silent> <Up> <C-o>gk
 map <silent> <Down> gj
@@ -82,6 +95,22 @@ map <silent> <home> g<home>
 map <silent> <End> g<End>
 nnoremap <expr> j (v:count == 0 ? 'gj' : 'j')
 nnoremap <expr> k (v:count == 0 ? 'gk' : 'k')
+" quick keys
+nmap <C-s> :w<CR>
+imap <C-s> <esc>:w<CR>
+nmap <leader>qq :qall<CR>
+" buffer
+nnoremap H :bprevious<CR>
+nnoremap L :bnext<CR>
+nnoremap <leader>bd :bdelete<CR>
+" tab
+nnoremap <leader>tn :tabnew<CR>
+nnoremap <leader>tn :tabnew<CR>
+nnoremap <leader>th :tabprevious<CR>
+nnoremap <leader>tl :tabnext<CR>
+" Explore
+nmap <leader>e :Explore<CR>
+
 
 setlocal linebreak
 setlocal nolist

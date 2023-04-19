@@ -76,6 +76,12 @@ set autoindent expandtab tabstop=2 shiftwidth=2
 set clipboard=unnamedplus
 set sms " smoothscroll
 
+" function! InsertLeaveChangeFcitx()
+"   system('fcitx-remote -c')
+" endfunction
+
+autocmd InsertLeave * :call system('fcitx-remote -c')
+
 " markdown
 autocmd bufreadpre *.md set conceallevel=2
 

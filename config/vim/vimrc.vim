@@ -22,6 +22,9 @@ let g:airline#extensions#wordcount#formatter = 'hans'
 " vim-easy-align
 Plug 'junegunn/vim-easy-align'
 
+" git
+Plug 'airblade/vim-gitgutter'
+
 " markdown
 Plug 'godlygeek/tabular'
 Plug 'preservim/vim-markdown'

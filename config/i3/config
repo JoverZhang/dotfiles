@@ -222,7 +222,8 @@ bindsym $mod+Ctrl+w mode "move"
 
 
 # shutdown / restart / suspend...
-set $mode_system System (1)Mute, (2)Volume-5%, (3)Volume+5%, (4)Light-5%, (5)Light+5%, (i)Light-default (l)lock, (e)logout, (s)suspend, (h)hibernate, (r)reboot, (CTRL+s)shutdown
+set $mode_system (1)Mute, (2)V-5%, (3)V+5%, (4)L-5%, (5)L+5%, (i)LD (l)lock, (e)logout, (s)suspend, (h)hibernate, (r)reboot, (CTRL+s)shutdown
+# set $mode_system System (1)Mute, (2)Volume-5%, (3)Volume+5%, (4)Light-5%, (5)Light+5%, (i)Light-default (l)lock, (e)logout, (s)suspend, (h)hibernate, (r)reboot, (CTRL+s)shutdown
 set $i3lockwall i3lock -i $HOME/DotFiles/config/i3/jover/black-2880x1800.png -t
 mode "$mode_system" {
     bindsym 1 exec --no-startup-id pactl set-sink-mute @DEFAULT_SINK@ toggle

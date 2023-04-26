@@ -3,6 +3,7 @@
 import os
 
 map = {
+    '$HOME/DotFiles/config/bottom': '$HOME/.config/bottom',
     '$HOME/DotFiles/config/h_command': '$HOME/.config/h_command',
     '$HOME/DotFiles/config/i3': '$HOME/.config/i3',
     '$HOME/DotFiles/config/neovim': '$HOME/.config/nvim',

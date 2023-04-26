@@ -127,6 +127,9 @@ alias p="proxychains -f $HOME/.local/share/proxychains/proxychains.conf"
 alias t='asynctask -f'
 alias docker='podman'
 
+alias ll='lsd -l --color=auto'
+alias l='ll -a'
+
 # Environments
 export WS="$HOME/Workspace"
 export EDITOR='/bin/nvim'

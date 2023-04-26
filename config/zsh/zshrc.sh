@@ -210,6 +210,40 @@ fzf-ls-cd-widget() {
 # fpath
 fpath+=~/.zfunc
 
+# commmon commands
+declare -a COMMANDS=(
+	# exa
+	bat
+	lsd
+	dust # du
+	duf  # df
+	fd   # find
+	rg
+	ag
+	fzf
+	choose
+	jq
+	sd   # sed
+	tldr # man
+	btm
+	# hyperfine # time
+	# gping
+	curlie
+	dog # dig
+)
+for cmd in "${COMMANDS[@]}"; do
+	if ! command -v "$cmd" &>/dev/null; then
+		echo "command \"$cmd\" could not be found"
+	fi
+done
+
+# init zoxide
+if command -v zoxide &>/dev/null; then
+	eval "$(zoxide init zsh)"
+else
+	echo 'command "zoxide" could not be found'
+fi
+
 # auto start tmux
 # if command -v tmux &>/dev/null; then
 # 	if [ -z "$TMUX" ]; then

@@ -1,11 +1,10 @@
 tool = fzf
 flags = --nth=1 --reverse +s --inline-info --height 35% --no-mouse
-includes = ~/.config/h_command/zc_config, ~/.config/h_command/zc_config
-
+includes = ~/.config/h_command/zc_config.toml
 
 # EDIT
 [000-edit-config]
-command = $EDITOR ~/.config/h_command/config
+command = $EDITOR ~/.config/h_command/config.toml
 
 [edit-i3config]
 command = $EDITOR ~/.config/i3/config

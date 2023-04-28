@@ -123,7 +123,7 @@ LC_TIME=en_US.UTF-8
 ##############################################################################
 
 # Aliases
-alias p="proxychains -f $HOME/.local/share/proxychains/proxychains.conf"
+alias p="proxychains -f $HOME/.config/proxychains/proxychains.conf"
 alias t='asynctask -f'
 alias docker='podman'
 

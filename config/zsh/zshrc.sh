@@ -139,6 +139,10 @@ export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin:$HOME/.cargo/bin"
 #export HTTPS_PROXY=http://127.0.0.1:8889
 export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
 
+# Window
+export GDK_SCALE=2
+export GDK_DPI_SCALE=0.5
+
 # golang
 if command -v go &>/dev/null; then
 	export GOROOT=$(go env GOROOT)

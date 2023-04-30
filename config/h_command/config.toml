@@ -148,3 +148,11 @@ command = cmake -DCMAKE_BUILD_TYPE=Debug -G "Ninja" -DCMAKE_EXPORT_COMPILE_COMMA
 
 [cmake-build-debug]
 command = cmake --build ./cmake-build-debug --target $(?target) -- -j 12
+
+
+# QEMU
+[qemu-start-kernel]
+command = qemu-system-x86_64 -serial mon:stdio -kernel build/bzImage -initrd build/initramfs.cpio.gz -machine accel=kvm:tcg -append "console=ttyS0 quiet rdinit=$(INIT)"
+
+[qemu-start-kernel-debug]
+command = qemu-system-x86_64 -serial mon:stdio -kernel build/bzImage -initrd build/initramfs.cpio.gz -machine accel=kvm:tcg -append "console=ttyS0 quiet rdinit=$(INIT)" -s -S

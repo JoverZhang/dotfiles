@@ -1,0 +1,58 @@
+#!/bin/python3
+import os
+import sys
+import openai
+from argparse import Namespace, ArgumentParser
+
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+
+def parse_args() -> Namespace:
+    parser: ArgumentParser = ArgumentParser(
+        prog='gpt', usage='%(prog)s [options] [message]')
+
+    parser.add_argument('message', type=str, nargs='*', help='message')
+
+    parser.add_argument('--gpt4',
+                        dest='gpt4',
+                        type=str,
+                        help='send message to gpt4')
+    parser.add_argument('-m',
+                        dest='models',
+                        action='store_true',
+                        help='print model list')
+    parser.add_argument('-v',
+                        dest='verbose',
+                        action='store_true',
+                        help='print additional information')
+    if len(sys.argv) == 1:
+        parser.print_help()
+        exit(0)
+    return parser.parse_args()
+
+
+def main():
+    args = parse_args()
+
+    if args.models:
+        for model in openai.Model.list()['data']:
+            print(f'{model.id}: {model.object}')
+        exit(0)
+
+    if args.message:
+        reply = openai.ChatCompletion.create(model='gpt-3.5-turbo',
+                                             messages=[{
+                                                 "role":
+                                                 "user",
+                                                 "content":
+                                                 args.message[0]
+                                             }])
+        print(reply.choices[0].message.content)
+        if args.verbose:
+            print(
+                f'\n=== completion: {reply.usage.completion_tokens}, prompt: {reply.usage.prompt_tokens} ==='
+            )
+
+
+if __name__ == "__main__":
+    main()

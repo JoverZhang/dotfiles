@@ -21,6 +21,12 @@ font pango:DejaVu Sans Mono 10
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
 #font pango:DejaVu Sans Mono 8
 
+
+hide_edge_borders smart_no_gaps
+workspace_auto_back_and_forth yes
+# gaps inner 10
+# smart_gaps inverse_outer
+
 # Start XDG autostart .desktop files using dex. See also
 # https://wiki.archlinux.org/index.php/XDG_Autostart
 exec --no-startup-id dex --autostart --environment i3
@@ -142,8 +148,6 @@ bindsym $sup+7 workspace number $ws7
 bindsym $sup+8 workspace number $ws8
 bindsym $sup+9 workspace number $ws9
 bindsym $sup+0 workspace number $ws10
-
-workspace_auto_back_and_forth yes
 
 # reload the configuration file
 bindsym $mod+Shift+c reload
@@ -292,7 +296,6 @@ for_window [instance="Telegram" class="TelegramDesktop"] floating enable
 
 for_window [instance="scheduler-electron" class="scheduler-electron"] floating enable
 
-# gaps inner 5
 
 # Colors
 ###Color variables
@@ -317,12 +320,21 @@ client.background       #ffffff
 
 include ./jover/autostart.conf
 
+bindsym $mod+b bar mode toggle main
+
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
 bar {
+    id main
+    font pango:DejaVu Sans Mono 9
+
     status_command i3status --config ~/.config/i3/jover/i3status.conf
 
     position top
+    tray_output primary
+    tray_padding 0
+    workspace_min_width 20
+
     colors {
         background $bg-color
         separator #757575

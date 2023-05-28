@@ -1,0 +1,30 @@
+### GDB-Dashboard
+source ~/DotFiles/config/gdb/gdb-dashboard/.gdbinit
+
+
+### RR
+# get around CLion/QtCreator not supporting target extended-remote
+define target remote
+target extended-remote $arg0
+end
+
+define target hook-extended-remote
+source ~/.rr_gdbinit
+end
+
+# optional: prevent gdb asking for confirmation
+# when invoking the run command in gdb
+set confirm off
+
+set remotetimeout 100000
+
+
+### Commands
+define plist
+  set var $n = $arg0->head
+  while $n
+    printf "%d ", $n->data
+    set var $n = $n->next
+  end
+end
+

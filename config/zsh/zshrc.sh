@@ -12,7 +12,7 @@ export ZSH="$ZSH_ROOT/oh-my-zsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 if [ -z "$ZSH_THEME" ]; then
-	ZSH_THEME="jonathan"
+	ZSH_THEME="kolo"
 fi
 
 # Set list of themes to pick from when loading at random

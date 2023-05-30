@@ -80,9 +80,20 @@ plugins=(git docker kubectl)
 source $ZSH/oh-my-zsh.sh
 source $ZSH_ROOT/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source $ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh
-source $ZSH_ROOT/zsh-file-manager/zsh-file-manager.zsh
+# source $ZSH_ROOT/zsh-file-manager/zsh-file-manager.zsh
 source $DOT_FILES/fzf/shell/completion.zsh
 source $DOT_FILES/fzf/shell/key-bindings.zsh
+
+function ranger-cd {
+	tempfile="$(mktemp -t tmp.ranger-cd.XXXXXX)"
+	/usr/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
+	test -f "$tempfile" &&
+		if [ "$(cat -- "$tempfile")" != "$(echo -n $(pwd))" ]; then
+			cd -- "$(cat "$tempfile")"
+		fi
+	rm -f -- "$tempfile"
+}
+bindkey -s '^F' 'ranger-cd\n'
 
 # User configuration
 
@@ -223,6 +234,7 @@ declare -a COMMANDS=(
 	duf  # df
 	fd   # find
 	rg
+	ranger
 	ag
 	fzf
 	choose

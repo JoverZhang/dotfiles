@@ -141,6 +141,9 @@ alias docker='podman'
 alias ll='lsd -l --color=auto'
 alias l='ll -a'
 
+alias rm='rm -i'
+alias mv='mv -i'
+
 # Environments
 export WS="$HOME/Workspace"
 export EDITOR='/bin/nvim'

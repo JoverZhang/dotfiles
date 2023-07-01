@@ -31,7 +31,7 @@ command = git config --global --unset http.proxy && git config --global --unset 
 
 
 # NET
-[net-check-port]
+[net-check-port(lsof)]
 command = sudo lsof -i :$(?port)
 
 [net-host-ip]

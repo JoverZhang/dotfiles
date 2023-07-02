@@ -147,7 +147,10 @@ command = setxkbmap -option
 command = cmake -DCMAKE_BUILD_TYPE=Debug -G "Ninja" -DCMAKE_EXPORT_COMPILE_COMMANDS=1 -S ./ -B ./cmake-build-debug
 
 [cmake-build-debug]
-command = cmake --build ./cmake-build-debug --target $(?target) -- -j 12
+command = mkdir -p build && cmake -B build && cmake --build build -j
+
+[cmake-build-debug-target]
+command = mkdir -p cmake-build-debug cmake --build ./cmake-build-debug --target $(?target) -- -j
 
 
 # QEMU

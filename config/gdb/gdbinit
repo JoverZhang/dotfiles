@@ -1,6 +1,20 @@
 ### GDB-Dashboard
 source ~/DotFiles/config/gdb/gdb-dashboard/.gdbinit
 
+define d-default
+  dashboard -layout assembly breakpoints registers source stack threads variables
+end
+
+define d-all
+  dashboard -layout assembly breakpoints registers source stack threads variables history expressions memory
+end
+
+define d-custom
+  dashboard -layout breakpoints source stack threads variables
+end
+
+d-custom
+
 
 ### RR
 # get around CLion/QtCreator not supporting target extended-remote

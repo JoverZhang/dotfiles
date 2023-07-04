@@ -163,6 +163,7 @@ LC_TIME=en_US.UTF-8
 alias p="proxychains -f $HOME/.config/proxychains/proxychains.conf"
 alias t='asynctask -f'
 alias docker='podman'
+alias nvide='neovide'
 
 alias ll='lsd -l --color=auto'
 alias l='ll -a'

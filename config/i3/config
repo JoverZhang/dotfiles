@@ -187,10 +187,11 @@ mode "resize" {
         # back to normal: Enter or Escape or $mod+r
         bindsym Return mode "default"
         bindsym Escape mode "default"
-        bindsym $mod+r mode "default"
+        bindsym $mod+Ctrl+r mode "default"
+        bindsym $mod+Ctrl+w mode "move"
 }
 
-bindsym $mod+r mode "resize"
+bindsym $mod+Ctrl+r mode "resize"
 
 
 # move
@@ -224,6 +225,7 @@ mode "move" {
         bindsym Return mode "default"
         bindsym Escape mode "default"
         bindsym $mod+Ctrl+w mode "default"
+        bindsym $mod+Ctrl+r mode "resize"
 }
 
 bindsym $mod+Ctrl+w mode "move"

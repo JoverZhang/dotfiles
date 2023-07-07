@@ -291,10 +291,10 @@ else
 fi
 
 # auto start tmux
-# if command -v tmux &>/dev/null; then
-# 	if [ -z "$TMUX" ]; then
-# 		tmux
-# 	fi
-# else
-# 	echo 'command "tmux" could not be found'
-# fi
+if command -v tmux &>/dev/null; then
+	if [ -z "$TMUX" -a -z "$DONT_TMUX" ]; then
+		tmux
+	fi
+else
+	echo 'command "tmux" could not be found'
+fi

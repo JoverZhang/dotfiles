@@ -163,7 +163,7 @@ LC_TIME=en_US.UTF-8
 alias p="proxychains -f $HOME/.config/proxychains/proxychains.conf"
 alias t='asynctask -f'
 alias docker='podman'
-alias nvid='neovide'
+alias nvid='neovide --neovim-bin $HOME/Tools/bin/nvim'
 
 alias ll='lsd -l --color=auto'
 alias l='ll -a'
@@ -174,7 +174,7 @@ alias mv='mv -i'
 # Environments
 export WS="$HOME/Workspace"
 export EDITOR='/bin/nvim'
-export PATH="$PATH:$HOME/DotFiles/bin:$HOME/Tools/bin:$HOME/.cargo/bin"
+export PATH="$HOME/DotFiles/bin:$HOME/Tools/bin:$PATH:$HOME/.cargo/bin"
 
 #export HTTP_PROXY=http://127.0.0.1:8889
 #export HTTPS_PROXY=http://127.0.0.1:8889

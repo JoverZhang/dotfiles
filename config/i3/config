@@ -126,7 +126,7 @@ set $ws9 "9"
 set $ws10 "10"
 
 # switch to workspace
-bindsym $mod+Escape workspace $wst
+bindsym $mod+Tab workspace $wst
 bindsym $mod+F1 workspace number $ws1
 bindsym $mod+F2 workspace number $ws2
 bindsym $mod+F3 workspace number $ws3
@@ -274,8 +274,8 @@ bindsym $mod+Shift+s exec flameshot gui
 bindsym $sup+e exec thunar
 bindsym --release $mod+Ctrl+x exec xkill
 
-bindsym $mod+Shift+Tab focus left
-bindsym $mod+Tab focus right
+bindsym $mod+Shift+Escape focus left
+bindsym $mod+Escape focus right
 
 bindsym $mod+Shift+minus move scratchpad
 bindsym $mod+minus scratchpad show

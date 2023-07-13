@@ -35,3 +35,12 @@
 [submodule "config/gdb/gdb-dashboard"]
 	path = config/gdb/gdb-dashboard
 	url = https://github.com/cyrus-and/gdb-dashboard.git
+	shallow = true
+[submodule "config/tmux/plugins/tmux-fzf-session-switch"]
+	path = config/tmux/plugins/tmux-fzf-session-switch
+	url = https://github.com/thuanowa/tmux-fzf-session-switch
+	shallow = true
+[submodule "config/tmux/oh-my-tmux"]
+	path = config/tmux/oh-my-tmux
+	url = https://github.com/gpakosz/.tmux.git
+	shallow = true

@@ -124,6 +124,8 @@ command = xprop
 [misc-grep]
 command = rg -n --no-heading "$(?word)" "$(?path:$PWD)"
 
+[misc-weather]
+command = curl v2.wttr.in/Guangzhou
 
 # Device
 [device-cpu-frequency-show]

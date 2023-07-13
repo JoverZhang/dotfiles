@@ -395,6 +395,10 @@ unbind h
 unbind j
 unbind k
 unbind l
+unbind H
+unbind J
+unbind K
+unbind L
 unbind C-h
 unbind C-l
 unbind e

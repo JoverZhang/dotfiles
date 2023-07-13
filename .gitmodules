@@ -44,3 +44,6 @@
 	path = config/tmux/oh-my-tmux
 	url = https://github.com/gpakosz/.tmux.git
 	shallow = true
+[submodule "config/tmux/plugins/tpm"]
+	path = config/tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm

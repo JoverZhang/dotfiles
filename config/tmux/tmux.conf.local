@@ -76,7 +76,7 @@ tmux_conf_theme_colour_5="#ffff00"    # yellow
 tmux_conf_theme_colour_6="#080808"    # dark gray
 tmux_conf_theme_colour_7="#e4e4e4"    # white
 tmux_conf_theme_colour_8="#080808"    # dark gray
-tmux_conf_theme_colour_9="#ffff00"    # yellow
+tmux_conf_theme_colour_9="#ff6d00"    # orange
 tmux_conf_theme_colour_10="#ff00af"   # pink
 tmux_conf_theme_colour_11="#5fff00"   # green
 tmux_conf_theme_colour_12="#8a8a8a"   # light gray
@@ -215,14 +215,18 @@ tmux_conf_theme_window_status_last_bg="$tmux_conf_theme_colour_2"
 tmux_conf_theme_window_status_last_attr="none"
 
 # status left/right sections separators
-tmux_conf_theme_left_separator_main=""
-tmux_conf_theme_left_separator_sub="|"
-tmux_conf_theme_right_separator_main=""
-tmux_conf_theme_right_separator_sub="|"
-#tmux_conf_theme_left_separator_main='\uE0B0'  # /!\ you don't need to install Powerline
-#tmux_conf_theme_left_separator_sub='\uE0B1'   #   you only need fonts patched with
-#tmux_conf_theme_right_separator_main='\uE0B2' #   Powerline symbols or the standalone
-#tmux_conf_theme_right_separator_sub='\uE0B3'  #   PowerlineSymbols.otf font, see README.md
+# tmux_conf_theme_left_separator_main=""
+# tmux_conf_theme_left_separator_sub="|"
+# tmux_conf_theme_right_separator_main=""
+# tmux_conf_theme_right_separator_sub="|"
+# tmux_conf_theme_left_separator_main='\uE0B0'  # /!\ you don't need to install Powerline
+# tmux_conf_theme_left_separator_sub='\uE0B1'   #   you only need fonts patched with
+# tmux_conf_theme_right_separator_main='\uE0B2' #   Powerline symbols or the standalone
+# tmux_conf_theme_right_separator_sub='\uE0B3'  #   PowerlineSymbols.otf font, see README.md
+tmux_conf_theme_left_separator_main=''
+tmux_conf_theme_left_separator_sub='\uE0B1'
+tmux_conf_theme_right_separator_main=''
+tmux_conf_theme_right_separator_sub='\uE0B3'
 
 # status left/right content:
 #   - separate main sections with "|"
@@ -251,13 +255,14 @@ tmux_conf_theme_right_separator_sub="|"
 #     - #{uptime_s}
 #     - #{username}
 #     - #{username_ssh}
-tmux_conf_theme_status_left=" ❐ #S | ↑#{?uptime_y, #{uptime_y}y,}#{?uptime_d, #{uptime_d}d,}#{?uptime_h, #{uptime_h}h,}#{?uptime_m, #{uptime_m}m,} "
+# tmux_conf_theme_status_left=" ❐ #S | ↑#{?uptime_y, #{uptime_y}y,}#{?uptime_d, #{uptime_d}d,}#{?uptime_h, #{uptime_h}h,}#{?uptime_m, #{uptime_m}m,} "
+tmux_conf_theme_status_left=" #{?client_prefix,Ω,ω} [#S] | #{weather} "
 tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized}#{?battery_status,#{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{username}#{root} | #{hostname} "
 
 # status left style
-tmux_conf_theme_status_left_fg="$tmux_conf_theme_colour_6,$tmux_conf_theme_colour_7,$tmux_conf_theme_colour_8"
-tmux_conf_theme_status_left_bg="$tmux_conf_theme_colour_9,$tmux_conf_theme_colour_10,$tmux_conf_theme_colour_11"
-tmux_conf_theme_status_left_attr="bold,none,none"
+tmux_conf_theme_status_left_fg="$tmux_conf_theme_colour_6,$tmux_conf_theme_colour_8"
+tmux_conf_theme_status_left_bg="$tmux_conf_theme_colour_9,$tmux_conf_theme_colour_11"
+tmux_conf_theme_status_left_attr="bold,bold"
 
 # status right style
 tmux_conf_theme_status_right_fg="$tmux_conf_theme_colour_12,$tmux_conf_theme_colour_13,$tmux_conf_theme_colour_14"
@@ -327,10 +332,11 @@ tmux_conf_battery_vbar_palette="gradient"
 #tmux_conf_battery_vbar_palette="#d70000,#ff5f00,#5fff00"  # red, orange, green
 
 # symbols used to indicate whether battery is charging or discharging
-tmux_conf_battery_status_charging="↑"       # U+2191
-tmux_conf_battery_status_discharging="↓"    # U+2193
-#tmux_conf_battery_status_charging="🔌"     # U+1F50C
-#tmux_conf_battery_status_discharging="🔋"  # U+1F50B
+# tmux_conf_battery_status_charging="↑"       # U+2191
+# tmux_conf_battery_status_discharging="↓"    # U+2193
+# tmux_conf_battery_status_charging="🔌"     # U+1F50C
+tmux_conf_battery_status_charging="⚡"
+tmux_conf_battery_status_discharging="🔋"
 
 # clock style (when you hit <prefix> + t)
 # you may want to use %I:%M %p in place of %R in tmux_conf_theme_status_right
@@ -353,10 +359,10 @@ tmux_conf_copy_to_os_clipboard=false
 # this is the place to override or undo settings
 
 # increase history size
-#set -g history-limit 10000
+set -g history-limit 100000
 
 # start with mouse mode enabled
-#set -g mouse on
+set -g mouse on
 
 # force Vi mode
 #   really you should export VISUAL or EDITOR environment variable, see manual
@@ -364,14 +370,111 @@ tmux_conf_copy_to_os_clipboard=false
 #set -g mode-keys vi
 
 # replace C-b by C-a instead of using both prefixes
-# set -gu prefix2
-# unbind C-a
-# unbind C-b
-# set -g prefix C-a
-# bind C-a send-prefix
+set -gu prefix2
+unbind C-a
+unbind C-b
+set -g prefix C-a
+bind C-a send-prefix
 
 # if you don't want Oh my tmux! to alter a binding, use #!important
 # bind c new-window -c '#{pane_current_path}' #!important
+
+
+# -- custom bindings -----------------------------------------------------------
+
+# reset tmux default bindings
+unbind '"'
+unbind %
+
+# reset oh-my-tmux default bindings
+unbind C-c
+unbind c
+unbind _
+unbind -
+unbind h
+unbind j
+unbind k
+unbind l
+unbind C-h
+unbind C-l
+unbind e
+unbind r
+
+
+# pane navigation
+bind C-h select-pane -L
+bind C-l select-pane -R
+bind C-k select-pane -U
+bind C-j select-pane -D
+# pane split
+bind v split-pane -h -c "#{pane_current_path}"
+bind s split-pane -v -c "#{pane_current_path}"
+# move pane
+bind j command-prompt -p "send pane to:"  "join-pane -t '%%'"
+bind J command-prompt -p "join pane from:"  "join-pane -s '%%'"
+
+# window navigation
+bind -n M-1 select-window -t 1
+bind -n M-2 select-window -t 2
+bind -n M-3 select-window -t 3
+bind -n M-4 select-window -t 4
+bind -n M-5 select-window -t 5
+bind -n M-6 select-window -t 6
+bind -n M-7 select-window -t 7
+bind -n M-8 select-window -t 8
+bind -n M-9 select-window -t 9
+bind -n M-0 select-window -t 10
+bind C-[ last-window
+# create window
+bind c new-window -c "#{pane_current_path}"
+# move window
+bind T command-prompt -I "" "move-window -t '%%'"
+
+# session navigation
+bind C-w choose-session
+bind C-] switch-client -l
+
+# copy and buffer
+bind -T copy-mode-vi y \
+    send-keys -X copy-pipe "pbcopy" \; \
+    run "tmux save-buffer - | xsel -ib"
+bind -T copy-mode-vi Y \
+    send-keys -X copy-pipe-and-cancel "pbcopy" \; \
+    run "tmux save-buffer - | xsel -ib"
+bind p run "tmux set-buffer \"$(xsel -ob)\"; tmux paste-buffer"
+# copy when mouse selected
+bind -T copy-mode-vi MouseDragEnd1Pane \
+    send-keys -X copy-pipe "pbcopy" \;\
+    run "tmux save-buffer - | xsel -ib"
+# copy word when double clicked
+bind -n DoubleClick1Pane \
+    select-pane \; \
+    copy-mode -M \; \
+    send-keys -X select-word \; \
+    run-shell "sleep .5s" \; \
+    send-keys -X copy-pipe "pbcopy" \; \
+    run "tmux save-buffer - | xsel -ib"
+bind -T copy-mode-vi DoubleClick1Pane \
+    select-pane \; \
+    send-keys -X select-word \; \
+    run-shell "sleep .5s" \; \
+    send-keys -X copy-pipe "pbcopy" \; \
+    run "tmux save-buffer - | xsel -ib"
+# copy line when triple clicked
+bind -n TripleClick1Pane \
+    select-pane \; \
+    copy-mode -M \; \
+    send-keys -X select-line \; \
+    run-shell "sleep .5s" \; \
+    send-keys -X copy-pipe "pbcopy" \; \
+    run "tmux save-buffer - | xsel -ib"
+bind -T copy-mode-vi TripleClick1Pane \
+    select-pane \; \
+    send-keys -X select-line \; \
+    run-shell "sleep .5s" \; \
+    send-keys -X copy-pipe "pbcopy" \; \
+    run "tmux save-buffer - | xsel -ib"
+
 
 # move status line to top
 #set -g status-position top
@@ -414,7 +517,11 @@ tmux_conf_uninstall_plugins_on_reload=true
 # visit https://github.com/tmux-plugins for available plugins
 #set -g @plugin 'tmux-plugins/tmux-copycat'
 #set -g @plugin 'tmux-plugins/tmux-cpu'
-#set -g @plugin 'tmux-plugins/tmux-resurrect'
+
+set -g @plugin 'tmux-plugins/tmux-resurrect'
+set -g @resurrect-save 'M-s'
+set -g @resurrect-restore 'M-r'
+
 #set -g @plugin 'tmux-plugins/tmux-continuum'
 #set -g @continuum-restore 'on'
 
@@ -435,7 +542,8 @@ tmux_conf_uninstall_plugins_on_reload=true
 # # /!\ do not "uncomment" the functions: the leading "# " characters are needed
 #
 # weather() {                                         # see https://github.com/chubin/wttr.in#one-line-output
-#   curl -f -s -m 2 'wttr.in?format=3' || printf '\n' # /!\ make sure curl is installed
+#   # curl -f -s -m 2 'wttr.in?format=3' || printf '\n' # /!\ make sure curl is installed
+#   curl -f -s -m 2 'https://wttr.in/Guangzhou?format=%C+%c%t+%m+%w\n'
 #   sleep 900                                         # sleep for 15 minutes, throttle network requests whatever the value of status-interval
 # }
 #

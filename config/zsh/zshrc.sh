@@ -174,7 +174,7 @@ alias mv='mv -i'
 # Environments
 export WS="$HOME/Workspace"
 export EDITOR='/bin/nvim'
-export PATH="$HOME/DotFiles/bin:$HOME/Tools/bin:$PATH:$HOME/.cargo/bin"
+export PATH="$HOME/DotFiles/bin:$HOME/Tools/bin:/snap/bin/:$PATH:$HOME/.cargo/bin"
 
 #export HTTP_PROXY=http://127.0.0.1:8889
 #export HTTPS_PROXY=http://127.0.0.1:8889

@@ -184,6 +184,9 @@ export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
 export GDK_SCALE=2
 export GDK_DPI_SCALE=0.5
 
+# Flutter
+export CHROME_EXECUTABLE='/usr/bin/google-chrome-stable'
+
 # golang
 if command -v go &>/dev/null; then
 	export GOROOT=$(go env GOROOT)

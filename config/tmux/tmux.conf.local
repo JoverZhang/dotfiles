@@ -257,7 +257,7 @@ tmux_conf_theme_right_separator_sub='\uE0B3'
 #     - #{username_ssh}
 # tmux_conf_theme_status_left=" ❐ #S | ↑#{?uptime_y, #{uptime_y}y,}#{?uptime_d, #{uptime_d}d,}#{?uptime_h, #{uptime_h}h,}#{?uptime_m, #{uptime_m}m,} "
 tmux_conf_theme_status_left=" #{?client_prefix,Ω,ω} [#S] | #{weather} "
-tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized}#{?battery_status,#{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{username}#{root} | #{hostname} "
+tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized}#{?battery_status,#{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{root}#{username}#{root} | #{hostname} "
 
 # status left style
 tmux_conf_theme_status_left_fg="$tmux_conf_theme_colour_6,$tmux_conf_theme_colour_8"
@@ -270,25 +270,25 @@ tmux_conf_theme_status_right_bg="$tmux_conf_theme_colour_15,$tmux_conf_theme_col
 tmux_conf_theme_status_right_attr="none,none,bold"
 
 # pairing indicator
-tmux_conf_theme_pairing="⚇"                 # U+2687
+tmux_conf_theme_pairing="👓"                 # U+2687
 tmux_conf_theme_pairing_fg="none"
 tmux_conf_theme_pairing_bg="none"
 tmux_conf_theme_pairing_attr="none"
 
 # prefix indicator
-tmux_conf_theme_prefix="⌨"                  # U+2328
+tmux_conf_theme_prefix="👀"                  # U+2328
 tmux_conf_theme_prefix_fg="none"
 tmux_conf_theme_prefix_bg="none"
 tmux_conf_theme_prefix_attr="none"
 
 # mouse indicator
-tmux_conf_theme_mouse="↗"                   # U+2197
+tmux_conf_theme_mouse="🐭"                   # U+2197
 tmux_conf_theme_mouse_fg="none"
 tmux_conf_theme_mouse_bg="none"
 tmux_conf_theme_mouse_attr="none"
 
 # root indicator
-tmux_conf_theme_root="!"
+tmux_conf_theme_root="⚠️ "
 tmux_conf_theme_root_fg="none"
 tmux_conf_theme_root_bg="none"
 tmux_conf_theme_root_attr="bold,blink"

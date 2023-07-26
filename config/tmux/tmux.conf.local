@@ -435,6 +435,8 @@ bind C-[ last-window
 bind c new-window -c "#{pane_current_path}"
 # move window
 bind T command-prompt -I "" "move-window -t '%%'"
+# rename window
+bind r command-prompt -I "" "rename-window '%%'"
 
 # session navigation
 bind C-w choose-session

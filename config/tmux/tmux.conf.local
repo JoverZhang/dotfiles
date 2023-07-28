@@ -405,6 +405,7 @@ unbind C-h
 unbind C-l
 unbind e
 unbind r
+unbind -n C-l
 
 
 # pane navigation
@@ -551,7 +552,7 @@ set -g @resurrect-restore 'M-r'
 #
 # weather() {                                         # see https://github.com/chubin/wttr.in#one-line-output
 #   # curl -f -s -m 2 'wttr.in?format=3' || printf '\n' # /!\ make sure curl is installed
-#   curl -f -s -m 2 'https://wttr.in/Guangzhou?format=%C+%c%t+%m+%w\n' || printf '\n'
+#   curl -f -s -m 2 'https://wttr.in/Guangzhou?format=%C+%c%t+%m+%w\n' || printf 'Unknown\n'
 #   sleep 900                                         # sleep for 15 minutes, throttle network requests whatever the value of status-interval
 # }
 #

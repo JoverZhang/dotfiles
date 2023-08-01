@@ -184,6 +184,9 @@ export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
 export GDK_SCALE=2
 export GDK_DPI_SCALE=0.5
 
+# Gradle
+export GRADLE_USER_HOME=$HOME/.gradle
+
 # Flutter
 export CHROME_EXECUTABLE='/usr/bin/google-chrome-stable'
 

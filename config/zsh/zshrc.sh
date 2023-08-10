@@ -176,9 +176,25 @@ export WS="$HOME/Workspace"
 export EDITOR='/bin/nvim'
 export PATH="$HOME/DotFiles/bin:$HOME/Tools/bin:/snap/bin/:$PATH:$HOME/.cargo/bin"
 
-#export HTTP_PROXY=http://127.0.0.1:8889
-#export HTTPS_PROXY=http://127.0.0.1:8889
-export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
+# # Proxy Enable
+# export http_proxy=http://127.0.0.1:8889
+# export HTTP_PROXY=http://127.0.0.1:8889
+# export https_proxy=http://127.0.0.1:8889
+# export HTTPS_PROXY=http://127.0.0.1:8889
+# export ftp_proxy=http://127.0.0.1:8889
+# export FTP_PROXY=http://127.0.0.1:8889
+# export no_proxy=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
+# export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
+#
+# # Proxy Disable
+# unset http_proxy
+# unset HTTP_PROXY
+# unset https_proxy
+# unset HTTPS_PROXY
+# unset ftp_proxy
+# unset FTP_PROXY
+# unset no_proxy
+# unset NO_PROXY
 
 # Window
 export GDK_SCALE=2

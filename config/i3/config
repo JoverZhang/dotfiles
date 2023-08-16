@@ -341,24 +341,24 @@ bindsym $mod+b bar mode toggle main
 
 # Start i3bar to display a workspace bar (plus the system information i3status
 # finds out, if available)
-bar {
-    id main
-    font pango:DejaVu Sans Mono 9
-
-    status_command i3status --config ~/.config/i3/jover/i3status.conf
-
-    position top
-    tray_output primary
-    tray_padding 0
-    workspace_min_width 20
-
-    colors {
-        background $bg-color
-        separator #757575
-
-        ###Fields: identifier border background text indicator
-        focused_workspace $bg-color $bg-color $text-color
-        inactive_workspace $inactive-bg-color $inactive-bg-color $inactive-text-color
-        urgent_workspace $urgent-bg-color $urgent-bg-color $text-color
-   }
-}
+# bar {
+#     id main
+#     font pango:DejaVu Sans Mono 9
+#
+#     status_command i3status --config ~/.config/i3/jover/i3status.conf
+#
+#     position top
+#     tray_output primary
+#     tray_padding 0
+#     workspace_min_width 20
+#
+#     colors {
+#         background $bg-color
+#         separator #757575
+#
+#         ###Fields: identifier border background text indicator
+#         focused_workspace $bg-color $bg-color $text-color
+#         inactive_workspace $inactive-bg-color $inactive-bg-color $inactive-text-color
+#         urgent_workspace $urgent-bg-color $urgent-bg-color $text-color
+#    }
+# }

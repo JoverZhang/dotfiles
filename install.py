@@ -9,6 +9,7 @@ map = {
     '$HOME/DotFiles/config/i3': '$HOME/.config/i3',
     '$HOME/DotFiles/config/neovim': '$HOME/.config/nvim',
     '$HOME/DotFiles/config/picom.conf': '$HOME/.config/picom.conf',
+    '$HOME/DotFiles/config/polybar': '$HOME/.config/polybar',
     '$HOME/DotFiles/config/proxychains': '$HOME/.config/proxychains',
     '$HOME/DotFiles/config/ranger': '$HOME/.config/ranger',
     '$HOME/DotFiles/config/tmux': '$HOME/.config/tmux',

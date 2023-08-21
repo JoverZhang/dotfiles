@@ -10,7 +10,7 @@ define d-all
 end
 
 define d-custom
-  dashboard -layout breakpoints source stack threads variables
+  dashboard -layout breakpoints stack threads source variables
 end
 
 d-custom

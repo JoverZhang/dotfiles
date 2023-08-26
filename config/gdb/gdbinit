@@ -42,3 +42,17 @@ define plist
   end
 end
 
+
+### Pretty Printers
+source /usr/share/gcc-13.1.1/python/libstdcxx/v6/printers.py
+
+python
+import sys
+sys.path.append('/usr/share/gcc-13.1.1/python/')
+import libstdcxx.v6.printers
+end
+
+python
+libstdcxx.v6.printers.register_libstdcxx_printers (None)
+end
+

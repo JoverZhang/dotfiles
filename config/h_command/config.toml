@@ -89,6 +89,12 @@ command = sudo swapon ~/.local/swaps/swapfile2
 [system-swapoff-2]
 command = sudo swapoff ~/.local/swaps/swapfile2
 
+[system-docker-start]
+command = sudo systemctl start docker.service
+
+[system-docker-stop]
+command = sudo systemctl stop docker.socket && sudo systemctl stop docker.service
+
 # MISC
 [misc-supervisor-reload]
 command = sudo supervisorctl reload

@@ -162,9 +162,10 @@ LC_TIME=en_US.UTF-8
 # Aliases
 alias p="proxychains -f $HOME/.config/proxychains/proxychains.conf"
 alias t='asynctask -f'
-alias docker='podman'
-alias docker-compose='podman-compose'
+# alias docker='podman'
+# alias docker-compose='podman-compose'
 alias nvid='neovide --neovim-bin $HOME/Tools/bin/nvim'
+alias redis-cli="$HOME/Workspace/sourcecode/github/redis/src/redis-cli"
 
 alias ll='lsd -l --color=auto'
 alias l='ll -a'
@@ -314,10 +315,10 @@ else
 fi
 
 # auto start tmux
-if command -v tmux &>/dev/null; then
-	if [ -z "$TMUX" -a -z "$DONT_TMUX" ]; then
-		tmux
-	fi
-else
-	echo 'command "tmux" could not be found'
-fi
+# if command -v tmux &>/dev/null; then
+# 	if [ -z "$TMUX" -a -z "$DONT_TMUX" ]; then
+# 		tmux
+# 	fi
+# else
+# 	echo 'command "tmux" could not be found'
+# fi

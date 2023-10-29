@@ -44,6 +44,23 @@ command = python3 -m http.server $(?port)
 [net-whois-domain]
 command = /usr/bin/whois -h whois.internic.net $(?domain) | sed '/NOTICE:/q'
 
+[net-iptables-redsocks-create-31338]
+command = sudo iptables -t nat -N REDSOCKS; sudo iptables -t nat -A REDSOCKS -d 0.0.0.0/8 -j RETURN; sudo iptables -t nat -A REDSOCKS -d 10.0.0.0/8 -j RETURN; sudo iptables -t nat -A REDSOCKS -d 127.0.0.0/8 -j RETURN; sudo iptables -t nat -A REDSOCKS -d 169.254.0.0/16 -j RETURN; sudo iptables -t nat -A REDSOCKS -d 172.16.0.0/12 -j RETURN; sudo iptables -t nat -A REDSOCKS -d 192.168.0.0/16 -j RETURN; sudo iptables -t nat -A REDSOCKS -d 224.0.0.0/4 -j RETURN; sudo iptables -t nat -A REDSOCKS -d 240.0.0.0/4 -j RETURN; sudo iptables -t nat -A REDSOCKS -p tcp -j REDIRECT --to-ports 31338
+
+[net-iptables-redsocks-delete]
+command = sudo iptables -t nat -F REDSOCKS; sudo iptables -t nat -X REDSOCKS
+
+[net-iptables-redsocks-show]
+command = sudo iptables -t nat -L REDSOCKS -n -v
+
+[net-iptables-redsocks-apply-for-docker]
+command = sudo iptables -t nat -A PREROUTING -i $(?driver:docker0) -p tcp -j REDSOCKS
+
+[net-iptables-redsocks-delete-for-docker]
+command = sudo iptables -t nat -D PREROUTING -i $(?driver:docker0) -p tcp -j REDSOCKS
+
+[net-iptables-redsocks-show-all-preroutings]
+command = sudo iptables -t nat -L PREROUTING -n -v
 
 # DOC
 [doc-git]

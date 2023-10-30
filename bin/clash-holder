@@ -1,0 +1,9 @@
+#!/bin/bash
+
+clash -f $HOME/Tools/config/clash.yml | while IFS= read -r line; do
+    echo $line
+    if [[ $line == *level=warning* ]]; then
+        notify-send "Clash Warning Detected" "$line"
+    fi
+done
+

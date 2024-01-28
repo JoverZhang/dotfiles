@@ -167,7 +167,7 @@ command = setxkbmap -option && setxkbmap -option ctrl:swapcaps
 command = setxkbmap -option
 
 [device-keyboard-rate]
-command = xset r rate 200 150
+command = xset r rate 200 100
 
 # CMake
 [cmake-generate-debug]

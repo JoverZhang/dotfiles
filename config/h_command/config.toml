@@ -24,7 +24,7 @@ command = echo $(?word1:word1) $(?word2) $(?word3:word3)
 
 # GIT
 [git-proxy-on]
-command = git config --global http.proxy "socks5://localhost:8889" && git config --global https.proxy "socks5://localhost:8889"
+command = git config --global http.proxy "http://localhost:8889" && git config --global https.proxy "http://localhost:8889"
 
 [git-proxy-off]
 command = git config --global --unset http.proxy && git config --global --unset https.proxy

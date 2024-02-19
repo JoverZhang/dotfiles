@@ -1,11 +1,15 @@
 #!/bin/python3
 import os
 import sys
-import openai
+from openai import OpenAI
 from argparse import Namespace, ArgumentParser
+from datetime import datetime
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
+# OpenAI client
+client = OpenAI(
+    # This is the default and can be omitted
+    api_key=os.environ.get("OPENAI_API_KEY"),
+)
 
 def parse_args() -> Namespace:
     parser: ArgumentParser = ArgumentParser(
@@ -35,17 +39,17 @@ def main():
     args = parse_args()
 
     if args.models:
-        for model in openai.Model.list()['data']:
-            print(f'{model.id}: {model.object}')
+        models = client.models.list()
+        models = sorted(models, key=lambda m: m.created, reverse=True)
+        for model in models:
+            print(f'{datetime.utcfromtimestamp(model.created)}: {model.id}')
         exit(0)
 
     if args.message:
-        reply = openai.ChatCompletion.create(model='gpt-3.5-turbo',
+        reply = client.chat.completions.create(model='gpt-3.5-turbo',
                                              messages=[{
-                                                 "role":
-                                                 "user",
-                                                 "content":
-                                                 args.message[0]
+                                                 "role": "user",
+                                                 "content": args.message[0]
                                              }])
         print(reply.choices[0].message.content)
         if args.verbose:

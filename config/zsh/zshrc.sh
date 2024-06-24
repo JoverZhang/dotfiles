@@ -34,8 +34,17 @@ if [ -z "$ZSH_THEME" ]; then
 		vcs_info
 	}
 
+	prompt_error() {
+		RETVAL=$?
+		if [ $RETVAL -ne 0 ]; then
+			echo "%F{red}✖ $RETVAL%f "
+		else
+			echo ""
+		fi
+	}
+
 	setopt prompt_subst
-	PROMPT='%B%F{magenta}%c%B%F{green}${vcs_info_msg_0_}%B %F{cyan}➜%{$reset_color%} '
+	PROMPT='$(prompt_error)%B%F{magenta}%c%B%F{green}${vcs_info_msg_0_}%B %F{cyan}➜%{$reset_color%} '
 
 	autoload -U add-zsh-hook
 	add-zsh-hook precmd theme_precmd
@@ -165,7 +174,7 @@ alias t='asynctask -f'
 # alias docker='podman'
 # alias docker-compose='podman-compose'
 alias nvid='neovide --neovim-bin $HOME/Tools/bin/nvim'
-alias redis-cli="$HOME/Workspace/sourcecode/github/redis/src/redis-cli"
+# alias redis-cli="$HOME/Workspace/sourcecode/github/redis/src/redis-cli"
 
 alias ll='lsd -l --color=auto'
 alias l='ll -a'

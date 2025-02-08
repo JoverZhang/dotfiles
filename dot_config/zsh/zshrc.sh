@@ -12,42 +12,42 @@ export ZSH="$ZSH_ROOT/ohmyzsh"
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 if [ -z "$ZSH_THEME" ]; then
-	# ZSH_THEME="kolo"
+  # ZSH_THEME="kolo"
 
-	# custom prompt
-	autoload -Uz vcs_info
+  # custom prompt
+  autoload -Uz vcs_info
 
-	zstyle ':vcs_info:*' stagedstr '%F{green}●'
-	zstyle ':vcs_info:*' unstagedstr '%F{yellow}●'
-	zstyle ':vcs_info:*' check-for-changes true
-	zstyle ':vcs_info:svn:*' branchformat '%b'
-	zstyle ':vcs_info:svn:*' formats ' [%b%F{1}:%F{11}%i%c%u%B%F{green}]'
-	zstyle ':vcs_info:*' enable git svn
+  zstyle ':vcs_info:*' stagedstr '%F{green}●'
+  zstyle ':vcs_info:*' unstagedstr '%F{yellow}●'
+  zstyle ':vcs_info:*' check-for-changes true
+  zstyle ':vcs_info:svn:*' branchformat '%b'
+  zstyle ':vcs_info:svn:*' formats ' [%b%F{1}:%F{11}%i%c%u%B%F{green}]'
+  zstyle ':vcs_info:*' enable git svn
 
-	theme_precmd() {
-		if [[ -z $(git ls-files --other --exclude-standard 2>/dev/null) ]]; then
-			zstyle ':vcs_info:git:*' formats ' [%b%c%u%B%F{green}]'
-		else
-			zstyle ':vcs_info:git:*' formats ' [%b%c%u%B%F{red}●%F{green}]'
-		fi
+  theme_precmd() {
+    if [[ -z $(git ls-files --other --exclude-standard 2>/dev/null) ]]; then
+      zstyle ':vcs_info:git:*' formats ' [%b%c%u%B%F{green}]'
+    else
+      zstyle ':vcs_info:git:*' formats ' [%b%c%u%B%F{red}●%F{green}]'
+    fi
 
-		vcs_info
-	}
+    vcs_info
+  }
 
-	prompt_error() {
-		RETVAL=$?
-		if [ $RETVAL -ne 0 ]; then
-			echo "%F{red}✖ $RETVAL%f "
-		else
-			echo ""
-		fi
-	}
+  prompt_error() {
+    RETVAL=$?
+    if [ $RETVAL -ne 0 ]; then
+      echo "%F{red}✖ $RETVAL%f "
+    else
+      echo ""
+    fi
+  }
 
-	setopt prompt_subst
-	PROMPT='$(prompt_error)%B%F{magenta}%c%B%F{green}${vcs_info_msg_0_}%B %F{cyan}➜%{$reset_color%} '
+  setopt prompt_subst
+  PROMPT='$(prompt_error)%B%F{magenta}%c%B%F{green}${vcs_info_msg_0_}%B %F{cyan}➜%{$reset_color%} '
 
-	autoload -U add-zsh-hook
-	add-zsh-hook precmd theme_precmd
+  autoload -U add-zsh-hook
+  add-zsh-hook precmd theme_precmd
 fi
 
 # Set list of themes to pick from when loading at random
@@ -120,13 +120,13 @@ source $HOME/Workspace/sourcecode/github/fzf/shell/completion.zsh
 source $HOME/Workspace/sourcecode/github/fzf/shell/key-bindings.zsh
 
 function ranger-cd {
-	tempfile="$(mktemp -t tmp.ranger-cd.XXXXXX)"
-	/usr/bin/ranger --choosedir="$tempfile" "${@:-$(pwd)}"
-	test -f "$tempfile" &&
-		if [ "$(cat -- "$tempfile")" != "$(echo -n $(pwd))" ]; then
-			cd -- "$(cat "$tempfile")"
-		fi
-	rm -f -- "$tempfile"
+  tempfile="$(mktemp -t tmp.ranger-cd.XXXXXX)"
+  ranger --choosedir="$tempfile" "${@:-$(pwd)}"
+  test -f "$tempfile" &&
+    if [ "$(cat -- "$tempfile")" != "$(echo -n $(pwd))" ]; then
+      cd -- "$(cat "$tempfile")"
+    fi
+  rm -f -- "$tempfile"
 }
 bindkey -s '^F' 'ranger-cd\n'
 
@@ -219,15 +219,15 @@ export CHROME_EXECUTABLE='/usr/bin/google-chrome-stable'
 
 # golang
 if command -v go &>/dev/null; then
-	export GOROOT=$(go env GOROOT)
-	export GOPATH=$(go env GOPATH)
-	export PATH=$PATH:$(go env GOPATH)/bin
+  export GOROOT=$(go env GOROOT)
+  export GOPATH=$(go env GOPATH)
+  export PATH=$PATH:$(go env GOPATH)/bin
 else
-	echo 'command "go" could not be found'
+  echo 'command "go" could not be found'
 fi
 # npm
 if ! (command -v npm &>/dev/null); then
-	echo 'command "npm" could not be found'
+  echo 'command "npm" could not be found'
 fi
 
 # fzf keymaps
@@ -237,47 +237,47 @@ fi
 
 # fshow - git commit browser
 fshow() {
-	local out sha q
-	while out=$(
-		git log --graph --color=always \
-			--format="%C(auto)%h%d %s %C(black)%C(bold)%cr" |
-			fzf --ansi --multi --no-sort --reverse --query="$q" --print-query
-	); do
-		q=$(head -1 <<<"$out")
-		while read sha; do
-			[ -n "$sha" ] && git show --color=always $sha | less -R
-		done < <(sed '1d;s/^[^a-z0-9]*//;/^$/d' <<<"$out" | awk '{print $1}')
-	done
+  local out sha q
+  while out=$(
+    git log --graph --color=always \
+      --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" |
+      fzf --ansi --multi --no-sort --reverse --query="$q" --print-query
+  ); do
+    q=$(head -1 <<<"$out")
+    while read sha; do
+      [ -n "$sha" ] && git show --color=always $sha | less -R
+    done < <(sed '1d;s/^[^a-z0-9]*//;/^$/d' <<<"$out" | awk '{print $1}')
+  done
 }
 
 # c-f
 fzf-ls-cd-widget() {
-	# local cmd="ls -al --color=yes | sed 1,2d"
-	local cmd="exa -bglHh --all --all --color=always | sed 1,2d"
-	setopt localoptions pipefail no_aliases 2>/dev/null
-	local dir="$(eval "$cmd" | FZF_DEFAULT_OPTS="--ansi --bind change:top --nth=9 --height ${FZF_TMUX_HEIGHT:-60%} --reverse --preview='if [ -f {9} ]; then bat -pn --color=always {9}; else ls -alH --color=yes {9}; fi' | awk '{ print \$9 }' --bind=ctrl-z:ignore ${FZF_DEFAULT_OPTS-} ${FZF_ALT_C_OPTS-}" $(__fzfcmd) +m | awk '{ print $9 }')"
+  local cmd="ls -al --color=yes | sed 1,2d"
+  # local cmd="exa -bglHh --all --all --color=always | sed 2,2d"
+  setopt localoptions pipefail no_aliases 2>/dev/null
+  local dir="$(eval "$cmd" | FZF_DEFAULT_OPTS="--ansi --bind change:top --nth=9 --height ${FZF_TMUX_HEIGHT:-60%} --reverse --preview='if [ -f {9} ]; then bat -pn --color=always {9}; else ls -alH --color=yes {9}; fi' | awk '{ print \$9 }' --bind=ctrl-z:ignore ${FZF_DEFAULT_OPTS-} ${FZF_ALT_C_OPTS-}" $(__fzfcmd) +m | awk '{ print $9 }')"
 
-	# skip
-	if [[ -z "$dir" ]]; then
-		zle redisplay
-		return 0
-	fi
+  # skip
+  if [[ -z "$dir" ]]; then
+    zle redisplay
+    return 0
+  fi
 
-	# push to buffer
-	if [[ -f "$dir" ]]; then
-		zle redisplay
-		BUFFER="$dir"
-		return 0
-	fi
+  # push to buffer
+  if [[ -f "$dir" ]]; then
+    zle redisplay
+    BUFFER="$dir"
+    return 0
+  fi
 
-	# cd to directory
-	zle push-line
-	BUFFER="builtin cd -- ${dir}"
-	zle accept-line
-	local ret=$?
-	unset dir
-	zle reset-prompt
-	return $ret
+  # cd to directory
+  zle push-line
+  BUFFER="builtin cd -- ${dir}"
+  zle accept-line
+  local ret=$?
+  unset dir
+  zle reset-prompt
+  return $ret
 }
 # autoload -Uz fzf-ls-cd-widget
 # zle -N fzf-ls-cd-widget
@@ -288,39 +288,41 @@ fzf-ls-cd-widget() {
 # fpath
 fpath+=~/.zfunc
 
+[ -f "~/.fzf.zsh" ] && source ~/.fzf.zsh
+
 # commmon commands
 declare -a COMMANDS=(
-	# exa
-	bat
-	lsd
-	dust # du
-	duf  # df
-	fd   # find
-	rg
-	ranger
-	ag
-	fzf
-	choose
-	jq
-	sd   # sed
-	tldr # man
-	btm
-	# hyperfine # time
-	# gping
-	curlie
-	dog # dig
+  # exa
+  bat
+  lsd
+  dust # du
+  duf  # df
+  fd   # find
+  rg
+  ranger
+  ag
+  fzf
+  choose
+  jq
+  sd   # sed
+  tldr # man
+  btm
+  # hyperfine # time
+  # gping
+  curlie
+  dog # dig
 )
 for cmd in "${COMMANDS[@]}"; do
-	if ! command -v "$cmd" &>/dev/null; then
-		echo "command \"$cmd\" could not be found"
-	fi
+  if ! command -v "$cmd" &>/dev/null; then
+    echo "command \"$cmd\" could not be found"
+  fi
 done
 
 # init zoxide
 if command -v zoxide &>/dev/null; then
-	eval "$(zoxide init zsh)"
+  eval "$(zoxide init zsh)"
 else
-	echo 'command "zoxide" could not be found'
+  echo 'command "zoxide" could not be found'
 fi
 
 # auto start tmux

@@ -250,6 +250,30 @@ fshow() {
   done
 }
 
+function runbuild() {
+  TARGET=$(fzf --prompt="Select file to compile: ")
+  if [[ -z "$TARGET" ]]; then
+    echo "No file selected."
+    return 1
+  fi
+
+  # Select the compiler based on the file suffix
+  case "$TARGET" in
+  *.c) COMPILER="gcc" ;;
+  *.cpp) COMPILER="g++" ;;
+  *.go) COMPILER="go build -o" ;;
+  *.rs) COMPILER="rustc" ;;
+  *.py) COMPILER="python3" ;;
+  *.java) COMPILER="javac" ;;
+  *) echo "Unsupported file type." && return 1 ;;
+  esac
+
+  CMD="$COMPILER \"$TARGET\" -o \"${TARGET%.*}.out\" && \"./${TARGET%.*}.out\" && rm \"./${TARGET%.*}.out\" #auto_run"
+
+  print -s "$CMD"
+  eval "$CMD"
+}
+
 # c-f
 fzf-ls-cd-widget() {
   local cmd="ls -al --color=yes | sed 1,2d"

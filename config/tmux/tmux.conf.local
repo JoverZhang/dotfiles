@@ -352,7 +352,7 @@ tmux_conf_theme_clock_style="24"
 #   - disabled
 # on macOS, this requires installing reattach-to-user-namespace, see README.md
 # on Linux, this requires xsel, xclip or wl-copy
-tmux_conf_copy_to_os_clipboard=false
+tmux_conf_copy_to_os_clipboard=true
 
 
 # -- user customizations -------------------------------------------------------
@@ -458,45 +458,101 @@ bind C-w choose-session
 bind C-] switch-client -l
 
 # copy and buffer
-bind -T copy-mode-vi y \
-    send-keys -X copy-pipe "pbcopy" \; \
-    run "tmux save-buffer - | xsel -ib"
-bind -T copy-mode-vi Y \
-    send-keys -X copy-pipe-and-cancel "pbcopy" \; \
-    run "tmux save-buffer - | xsel -ib"
-bind p run "tmux set-buffer \"$(xsel -ob)\"; tmux paste-buffer"
-# copy when mouse selected
-bind -T copy-mode-vi MouseDragEnd1Pane \
-    send-keys -X copy-pipe "pbcopy" \;\
-    run "tmux save-buffer - | xsel -ib"
-# copy word when double clicked
+#bind -T copy-mode-vi y \
+#    send-keys -X copy-pipe "pbcopy" \; \
+#    run "tmux save-buffer - | xsel -ib"
+#bind -T copy-mode-vi Y \
+#    send-keys -X copy-pipe-and-cancel "pbcopy" \; \
+#    run "tmux save-buffer - | xsel -ib"
+#bind p run "tmux set-buffer \"$(xsel -ob)\"; tmux paste-buffer"
+## copy when mouse selected
+#bind -T copy-mode-vi MouseDragEnd1Pane \
+#    send-keys -X copy-pipe "pbcopy" \;\
+#    run "tmux save-buffer - | xsel -ib"
+## copy word when double clicked
+#bind -n DoubleClick1Pane \
+#    select-pane \; \
+#    copy-mode -M \; \
+#    send-keys -X select-word \; \
+#    run-shell "sleep .5s" \; \
+#    send-keys -X copy-pipe "pbcopy" \; \
+#    run "tmux save-buffer - | xsel -ib"
+#bind -T copy-mode-vi DoubleClick1Pane \
+#    select-pane \; \
+#    send-keys -X select-word \; \
+#    run-shell "sleep .5s" \; \
+#    send-keys -X copy-pipe "pbcopy" \; \
+#    run "tmux save-buffer - | xsel -ib"
+## copy line when triple clicked
+#bind -n TripleClick1Pane \
+#    select-pane \; \
+#    copy-mode -M \; \
+#    send-keys -X select-line \; \
+#    run-shell "sleep .5s" \; \
+#    send-keys -X copy-pipe "pbcopy" \; \
+#    run "tmux save-buffer - | xsel -ib"
+#bind -T copy-mode-vi TripleClick1Pane \
+#    select-pane \; \
+#    send-keys -X select-line \; \
+#    run-shell "sleep .5s" \; \
+#    send-keys -X copy-pipe "pbcopy" \; \
+#    run "tmux save-buffer - | xsel -ib"
+
+### === Selection Keybindings === ###
+bind -T copy-mode-vi v send -X begin-selection
+bind -T copy-mode-vi V send -X select-line
+bind -T copy-mode-vi C-v send -X rectangle-toggle
+bind -T copy-mode-vi y send -X copy-selection
+bind -T copy-mode-vi Escape send -X cancel
+
+### === Platform-aware Clipboard Copy === ###
+# Copy full buffer to clipboard with y (outside of copy-mode)
+if -b 'command -v wl-copy > /dev/null 2>&1' \
+  'bind y run -b "tmux save-buffer - | wl-copy"'
+if -b 'command -v xsel > /dev/null 2>&1' \
+  'bind y run -b "tmux save-buffer - | xsel -ib"'
+if -b 'command -v xclip > /dev/null 2>&1' \
+  'bind y run -b "tmux save-buffer - | xclip -i -selection clipboard"'
+if -b 'command -v pbcopy > /dev/null 2>&1' \
+  'bind y run -b "tmux save-buffer - | pbcopy"'
+if -b 'command -v reattach-to-user-namespace > /dev/null 2>&1' \
+  'bind y run -b "tmux save-buffer - | reattach-to-user-namespace pbcopy"'
+
+# Paste from clipboard (p)
+if -b 'command -v xsel > /dev/null 2>&1' \
+  'bind p run "tmux set-buffer \"$(xsel -ob)\"; tmux paste-buffer"'
+
+### === Mouse Support === ###
+# On mouse drag (select text with mouse), auto copy
+bind -T copy-mode-vi MouseDragEnd1Pane send -X copy-selection
+
+# Double click to copy word
 bind -n DoubleClick1Pane \
-    select-pane \; \
-    copy-mode -M \; \
-    send-keys -X select-word \; \
-    run-shell "sleep .5s" \; \
-    send-keys -X copy-pipe "pbcopy" \; \
-    run "tmux save-buffer - | xsel -ib"
+  select-pane \; \
+  copy-mode -M \; \
+  send-keys -X select-word \; \
+  run-shell "sleep 0.1" \; \
+  send-keys -X copy-selection
+
 bind -T copy-mode-vi DoubleClick1Pane \
-    select-pane \; \
-    send-keys -X select-word \; \
-    run-shell "sleep .5s" \; \
-    send-keys -X copy-pipe "pbcopy" \; \
-    run "tmux save-buffer - | xsel -ib"
-# copy line when triple clicked
+  select-pane \; \
+  send-keys -X select-word \; \
+  run-shell "sleep 0.1" \; \
+  send-keys -X copy-selection
+
+# Triple click to copy line
 bind -n TripleClick1Pane \
-    select-pane \; \
-    copy-mode -M \; \
-    send-keys -X select-line \; \
-    run-shell "sleep .5s" \; \
-    send-keys -X copy-pipe "pbcopy" \; \
-    run "tmux save-buffer - | xsel -ib"
+  select-pane \; \
+  copy-mode -M \; \
+  send-keys -X select-line \; \
+  run-shell "sleep 0.1" \; \
+  send-keys -X copy-selection
+
 bind -T copy-mode-vi TripleClick1Pane \
-    select-pane \; \
-    send-keys -X select-line \; \
-    run-shell "sleep .5s" \; \
-    send-keys -X copy-pipe "pbcopy" \; \
-    run "tmux save-buffer - | xsel -ib"
+  select-pane \; \
+  send-keys -X select-line \; \
+  run-shell "sleep 0.1" \; \
+  send-keys -X copy-selection
 
 
 # move status line to top

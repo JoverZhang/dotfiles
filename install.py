@@ -4,11 +4,10 @@ import os
 
 map = {
     '$HOME/DotFiles/config/bottom': '$HOME/.config/bottom',
-    '$HOME/DotFiles/config/h_command': '$HOME/.config/h_command',
     '$HOME/DotFiles/config/gdb/gdbinit': '$HOME/.gdbinit',
+    '$HOME/DotFiles/config/h_command': '$HOME/.config/h_command',
     '$HOME/DotFiles/config/i3': '$HOME/.config/i3',
     '$HOME/DotFiles/config/neovim': '$HOME/.config/nvim',
-    '$HOME/DotFiles/config/picom.conf': '$HOME/.config/picom.conf',
     '$HOME/DotFiles/config/polybar': '$HOME/.config/polybar',
     '$HOME/DotFiles/config/proxychains': '$HOME/.config/proxychains',
     '$HOME/DotFiles/config/ranger': '$HOME/.config/ranger',
@@ -16,6 +15,8 @@ map = {
     '$HOME/DotFiles/config/vim': '$HOME/.vim',
     '$HOME/DotFiles/config/xfce4/terminal': '$HOME/.config/xfce4/terminal',
     '$HOME/DotFiles/config/zsh': '$HOME/.config/zsh',
+    '$HOME/DotFiles/config/libinput-gestures.conf': '$HOME/.config/libinput-gestures.conf',
+    '$HOME/DotFiles/config/picom.conf': '$HOME/.config/picom.conf',
 }
 
 

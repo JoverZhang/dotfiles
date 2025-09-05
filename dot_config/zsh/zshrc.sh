@@ -169,7 +169,7 @@ LC_TIME=en_US.UTF-8
 ##############################################################################
 
 # Aliases
-alias ce="claude -p 'concisely explain the root cause of this build error' > output.txt"
+alias ce="claude -p 'concisely explain the root cause of this build error'"
 alias p="proxychains -f $HOME/.config/proxychains/proxychains.conf"
 alias t='asynctask -f'
 # alias docker='podman'

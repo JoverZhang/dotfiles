@@ -1,27 +1,6 @@
 [submodule "dot_config/nvim"]
 	path = dot_config/nvim
 	url = git@github.com:JoverZhang/neovim-config.git
-[submodule "dot_config/zsh/ohmyzsh"]
-	path = dot_config/zsh/ohmyzsh
-	url = https://github.com/ohmyzsh/ohmyzsh.git
-[submodule "dot_config/zsh/zsh-autosuggestions"]
-	path = dot_config/zsh/zsh-autosuggestions
-	url = https://github.com/zsh-users/zsh-autosuggestions.git
-[submodule "dot_config/zsh/zsh-syntax-highlighting"]
-	path = dot_config/zsh/zsh-syntax-highlighting
-	url = https://github.com/zsh-users/zsh-syntax-highlighting.git
 [submodule "dot_config/zsh/zsh-file-manager"]
 	path = dot_config/zsh/zsh-file-manager
 	url = git@github.com:JoverZhang/zsh-file-manager.git
-[submodule "dot_config/tmux/oh-my-tmux"]
-	path = dot_config/tmux/oh-my-tmux
-	url = https://github.com/gpakosz/.tmux.git
-[submodule "dot_config/tmux/plugins/tpm"]
-	path = dot_config/tmux/plugins/tpm
-	url = https://github.com/tmux-plugins/tpm
-[submodule "dot_config/tmux/plugins/tmux-fzf-session-switch"]
-	path = dot_config/tmux/plugins/tmux-fzf-session-switch
-	url = https://github.com/thuanowa/tmux-fzf-session-switch
-[submodule "dot_config/tmux/plugins/tmux-nova"]
-	path = dot_config/tmux/plugins/tmux-nova
-	url = https://github.com/o0th/tmux-nova.git

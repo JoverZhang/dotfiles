@@ -116,8 +116,8 @@ source $ZSH/oh-my-zsh.sh
 source $ZSH_ROOT/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source $ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh
 # source $ZSH_ROOT/zsh-file-manager/zsh-file-manager.zsh
-source $HOME/Workspace/sourcecode/github/fzf/shell/completion.zsh
-source $HOME/Workspace/sourcecode/github/fzf/shell/key-bindings.zsh
+source $ZSH_ROOT/fzf/shell/completion.zsh
+source $ZSH_ROOT/fzf/shell/key-bindings.zsh
 
 function ranger-cd {
   tempfile="$(mktemp -t tmp.ranger-cd.XXXXXX)"

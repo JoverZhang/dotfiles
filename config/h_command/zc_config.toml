@@ -1,6 +1,0 @@
-[zc-zhoucang-ssh-aws-database]
-command = ssh ubuntu@13.215.198.192 -i ~/.ssh/database-prod.pem
-
-[zc-guanzhou-mysql-prod]
-command = mycli -h 13.215.198.192 -uguanzhou -P 62458 -p0307a66dac5347be96e9913378234cdf
-

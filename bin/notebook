@@ -1,5 +1,0 @@
-#!/bin/bash
-
-xfce4-terminal --working-directory='/home/jover/Workspace/obsidian/NoteBooks' --command='vim' --title=NOTE_BOOK
-i3-msg -s $(i3 --get-socket) '[title="^NOTE_BOOK$"] move scratchpad'
-i3-msg -s $(i3 --get-socket) '[title="^NOTE_BOOK$"] scratchpad show'

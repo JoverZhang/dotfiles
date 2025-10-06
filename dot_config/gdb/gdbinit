@@ -1,0 +1,144 @@
+### GDB-Dashboard
+source {{ .chezmoi.homeDir }}.config/gdb/gdb-dashboard/.gdbinit
+
+#define d-default
+#  dashboard -layout assembly breakpoints registers source stack threads variables
+#end
+#
+#define d-all
+#  dashboard -layout assembly breakpoints registers source stack threads variables history expressions memory
+#end
+#
+#define d-custom
+#  dashboard -layout breakpoints stack threads source variables
+#end
+
+# dashboard default
+define d-default
+  dashboard -layout source variables
+  dashboard -style compact_values True
+  dashboard -style max_value_length 100
+  dashboard variables -style align True
+  dashboard variables -style compact False
+  dashboard source -style path True
+  dashboard source -style highlight-line True
+  dashboard source -style height 15
+end
+
+# dashboard disassemble
+define d-disassemble
+  dashboard -layout assembly source variables registers
+  dashboard assembly -style highlight-line True
+  dashboard assembly -style opcodes True
+  dashboard assembly -style function False
+  dashboard assembly -style height 10
+  dashboard source -style height 10
+end
+
+# dashboard state
+define d-state
+  dashboard -layout stack threads
+  #dashboard stack -style height 10
+  #dashboard threads -style height 5
+  dashboard threads -style all-inferiors True
+end
+
+# dashboard config
+define d-config
+  dashboard -layout breakpoints expressions history memory
+  dashboard
+end
+
+
+# Alias
+define df
+  d-default
+end
+define dd
+  d-disassemble
+end
+define ds
+  d-state
+end
+define dc
+  d-config
+end
+
+define f
+  finish
+end
+
+define rc
+  reverse-continue
+end
+define rn
+  reverse-next
+end
+define rni
+  reverse-nexti
+end
+define rs
+  reverse-step
+end
+define rsi
+  reverse-stepi
+end
+define rf
+  reverse-finish
+end
+
+
+df
+
+
+### RR
+## get around CLion/QtCreator not supporting target extended-remote
+#define target remote
+#target extended-remote $arg0
+#end
+#
+#define target hook-extended-remote
+#source ~/.rr_gdbinit
+#end
+#
+## optional: prevent gdb asking for confirmation
+## when invoking the run command in gdb
+#set confirm off
+#
+#set remotetimeout 100000
+#
+#
+#### Commands
+#define plist
+#  set var $n = $arg0->head
+#  while $n
+#    printf "%d ", $n->data
+#    set var $n = $n->next
+#  end
+#end
+#
+#
+#### Pretty Printers
+#source /usr/share/gcc-13.1.1/python/libstdcxx/v6/printers.py
+#
+#python
+#import sys
+#sys.path.append('/usr/share/gcc-13.1.1/python/')
+#import libstdcxx.v6.printers
+#end
+#
+#python
+#libstdcxx.v6.printers.register_libstdcxx_printers (None)
+#end
+
+### Rust
+python
+sys.path.insert(0, '/home/jover/.rustup/toolchains/1.71.0-x86_64-unknown-linux-gnu/lib/rustlib/etc')
+from gdb_lookup import register_printers
+register_printers(gdb)
+end
+
+set debuginfod enabled on
+
+### Kernel
+add-auto-load-safe-path /home/jover/Workspace/sourcecode/github/linux/scripts/gdb/vmlinux-gdb.py

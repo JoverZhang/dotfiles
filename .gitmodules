@@ -1,0 +1,8 @@
+[submodule "dot_config/nvim"]
+	path = dot_config/nvim
+	url = https://github.com/JoverZhang/neovim-config.git
+	pushurl = git@github.com:JoverZhang/neovim-config.git
+[submodule "dot_config/zsh/zsh-file-manager"]
+	path = dot_config/zsh/zsh-file-manager
+	url = https://github.com/JoverZhang/zsh-file-manager.git
+	pushurl = git@github.com:JoverZhang/zsh-file-manager.git

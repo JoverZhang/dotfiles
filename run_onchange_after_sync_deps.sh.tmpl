@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+
+# This script installs or updates core Zsh and Tmux plugin repositories
+# Used by chezmoi to bootstrap your shell environment across systems
+
+set -euo pipefail
+
+log() { printf "%s\n" "$*"; }
+try() { "$@" || { log "⚠️ failed: $*"; return 0; }; }
+
+# Clone a repo if it's not present
+clone_if_absent() {
+  local dir="$1" repo="$2"
+  if [[ -d "$dir/.git" ]]; then
+    log "✅ already installed: $(basename "$dir")"
+    return 0
+  fi
+  mkdir -p "$(dirname "$dir")"
+  log "⬇️ cloning $(basename "$dir") ..."
+  try git clone --depth=1 --single-branch "$repo" "$dir"
+}
+
+# Update an existing repo if present
+update_if_present() {
+  local dir="$1"
+  [[ -d "$dir/.git" ]] || return 0
+  log "⤴️ updating $(basename "$dir") ..."
+  try git -C "$dir" pull --ff-only
+}
+
+{{ $cfg := index .os .chezmoi.os }}
+# ------------------------------------------------------------
+# Combined list of repos: "directory|git_url"
+# ------------------------------------------------------------
+declare -a repos=(
+  # Zsh plugins
+  "{{ .chezmoi.homeDir }}/.config/zsh/ohmyzsh|https://github.com/ohmyzsh/ohmyzsh.git"
+  "{{ .chezmoi.homeDir }}/.config/zsh/zsh-autosuggestions|https://github.com/zsh-users/zsh-autosuggestions.git"
+  "{{ .chezmoi.homeDir }}/.config/zsh/zsh-syntax-highlighting|https://github.com/zsh-users/zsh-syntax-highlighting.git"
+  "{{ .chezmoi.homeDir }}/.config/zsh/fzf|https://github.com/junegunn/fzf.git"
+
+  # Tmux essentials
+  "{{ .chezmoi.homeDir }}/.config/tmux/oh-my-tmux|https://github.com/gpakosz/.tmux.git"
+  "{{ .chezmoi.homeDir }}/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm.git"
+
+  {{- if and (hasKey $cfg "use_gdb") ($cfg.use_gdb) }}
+  # Gdb plugins
+  "{{ .chezmoi.homeDir }}/.config/gdb/gdb-dashboard|https://github.com/cyrus-and/gdb-dashboard.git"
+  {{- end}}
+)
+
+# Loop through and install/update each repo
+for item in "${repos[@]}"; do
+  IFS='|' read -r dir repo <<<"$item"
+  clone_if_absent "$dir" "$repo"
+  update_if_present "$dir"
+done
+
+# ------------------------------------------------------------
+# Tmux Plugin Manager (TPM) bootstrap
+# ------------------------------------------------------------
+TPM="{{ .chezmoi.homeDir }}/.config/tmux/plugins/tpm"
+if [[ -x "$TPM/bin/install_plugins" ]]; then
+  log "🧩 TPM install_plugins"
+  try "$TPM/bin/install_plugins"
+fi
+if [[ -x "$TPM/bin/update_plugins" ]]; then
+  log "🧩 TPM update_plugins all"
+  try "$TPM/bin/update_plugins" all
+fi
+
+log "✅ Zsh & Tmux environments are ready."
+

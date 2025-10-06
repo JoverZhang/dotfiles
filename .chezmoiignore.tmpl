@@ -1,25 +1,25 @@
 .config/tmux/plugins/*
 !.config/tmux/plugins/.keep
 
+# Default ignore
 .config/i3
 .config/polybar
 .config/xfce4
 .config/libinput-gestures.conf
-# .config/yabai
+.config/picom.conf
+.config/gdb
 
-{{- $os := .chezmoi.os -}}
-{{- $cfg := index .os $os -}}
+{{- $cfg := index .os .chezmoi.os -}}
 
-{{- if eq $os "darwin" }}
-# !.config/yabai
-{{- end }}
+{{ if and (hasKey $cfg "use_gdb") ($cfg.use_gdb) }}
+!.config/gdb
+{{ end }}
 
-{{- if eq $os "linux" }}
-  {{- if $cfg.enable_xfce4 }}
+{{ if and (hasKey $cfg "use_xfce4_desktop") ($cfg.use_xfce4_desktop) }}
 !.config/i3
 !.config/polybar
 !.config/xfce4
 !.config/libinput-gestures.conf
-  {{- end }}
-{{- end }}
+!.config/picom.conf
+{{ end }}
 

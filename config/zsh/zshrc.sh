@@ -298,7 +298,7 @@ declare -a COMMANDS=(
 	fd   # find
 	rg
 	ranger
-	ag
+	# ag
 	fzf
 	choose
 	jq

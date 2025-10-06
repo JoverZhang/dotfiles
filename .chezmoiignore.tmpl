@@ -1,0 +1,25 @@
+.config/tmux/plugins/*
+!.config/tmux/plugins/.keep
+
+.config/i3
+.config/polybar
+.config/xfce4
+.config/libinput-gestures.conf
+# .config/yabai
+
+{{- $os := .chezmoi.os -}}
+{{- $cfg := index .os $os -}}
+
+{{- if eq $os "darwin" }}
+# !.config/yabai
+{{- end }}
+
+{{- if eq $os "linux" }}
+  {{- if $cfg.enable_xfce4 }}
+!.config/i3
+!.config/polybar
+!.config/xfce4
+!.config/libinput-gestures.conf
+  {{- end }}
+{{- end }}
+

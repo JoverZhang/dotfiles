@@ -1,0 +1,7 @@
+os:
+  linux:
+    enable_xfce4: false
+    proxy_port: 8889
+  darwin:
+    proxy_port: 9981
+

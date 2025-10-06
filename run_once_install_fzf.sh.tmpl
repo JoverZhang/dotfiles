@@ -1,8 +1,0 @@
-#!/bin/sh
-set -e
-
-# Clone fzf if uninstalled
-if [ ! -d "{{ .chezmoi.homeDir }}/Workspace/sourcecode/github/fzf" ]; then
-  git clone --depth 1 https://github.com/junegunn/fzf.git "{{ .chezmoi.homeDir }}/Workspace/sourcecode/github/fzf"
-fi
-

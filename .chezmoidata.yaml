@@ -1,6 +1,6 @@
 os:
   linux:
-    proxy_port: 8889
+    proxy_port: 8890
     use_gdb: true
     use_xfce4_desktop: false
   darwin:

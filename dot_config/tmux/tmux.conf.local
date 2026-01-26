@@ -357,6 +357,8 @@ tmux_conf_copy_to_os_clipboard=false
 set -g set-clipboard on
 set -as terminal-overrides ',*:Ms=\E]52;c;%p1%s\007'
 
+set -g extended-keys off
+
 # -- user customizations -------------------------------------------------------
 # this is the place to override or undo settings
 

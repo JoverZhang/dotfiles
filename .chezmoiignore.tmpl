@@ -3,12 +3,14 @@
 
 # Default ignore
 .config/i3
+.config/kitty
 .config/polybar
 .config/xfce4
 .config/libinput-gestures.conf
 .config/picom.conf
 .config/gdb
 
+# OS
 {{- $cfg := index .os .chezmoi.os -}}
 
 {{ if and (hasKey $cfg "use_gdb") ($cfg.use_gdb) }}
@@ -21,5 +23,9 @@
 !.config/xfce4
 !.config/libinput-gestures.conf
 !.config/picom.conf
+{{ end }}
+
+{{ if and (hasKey $cfg "use_kitty") ($cfg.use_kitty) }}
+!.config/kitty
 {{ end }}
 

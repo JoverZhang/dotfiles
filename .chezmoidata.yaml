@@ -4,5 +4,5 @@ os:
     use_gdb: true
     use_xfce4_desktop: false
   darwin:
-    proxy_port: 9981
+    proxy_port: 7981
 

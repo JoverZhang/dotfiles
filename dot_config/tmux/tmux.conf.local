@@ -471,20 +471,20 @@ bind -T copy-mode-vi Escape send -X clear-selection
 
 ### === Platform-aware Clipboard Copy === ###
 # Copy full buffer to clipboard with y (outside of copy-mode)
-if -b 'command -v wl-copy > /dev/null 2>&1' \
-  'bind y run -b "tmux save-buffer - | wl-copy"'
-if -b 'command -v xsel > /dev/null 2>&1' \
-  'bind y run -b "tmux save-buffer - | xsel -ib"'
-if -b 'command -v xclip > /dev/null 2>&1' \
-  'bind y run -b "tmux save-buffer - | xclip -i -selection clipboard"'
-if -b 'command -v pbcopy > /dev/null 2>&1' \
-  'bind y run -b "tmux save-buffer - | pbcopy"'
-if -b 'command -v reattach-to-user-namespace > /dev/null 2>&1' \
-  'bind y run -b "tmux save-buffer - | reattach-to-user-namespace pbcopy"'
+#if -b 'command -v wl-copy > /dev/null 2>&1' \
+#  'bind y run -b "tmux save-buffer - | wl-copy"'
+#if -b 'command -v xsel > /dev/null 2>&1' \
+#  'bind y run -b "tmux save-buffer - | xsel -ib"'
+#if -b 'command -v xclip > /dev/null 2>&1' \
+#  'bind y run -b "tmux save-buffer - | xclip -i -selection clipboard"'
+#if -b 'command -v pbcopy > /dev/null 2>&1' \
+#  'bind y run -b "tmux save-buffer - | pbcopy"'
+#if -b 'command -v reattach-to-user-namespace > /dev/null 2>&1' \
+#  'bind y run -b "tmux save-buffer - | reattach-to-user-namespace pbcopy"'
 
 # Paste from clipboard (p)
-if -b 'command -v xsel > /dev/null 2>&1' \
-  'bind p run "tmux set-buffer \"$(xsel -ob)\"; tmux paste-buffer"'
+#if -b 'command -v xsel > /dev/null 2>&1' \
+#  'bind p run "tmux set-buffer \"$(xsel -ob)\"; tmux paste-buffer"'
 
 ### === Mouse Support === ###
 # On mouse drag (select text with mouse), auto copy

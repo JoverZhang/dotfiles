@@ -10,12 +10,16 @@ gui:
       - reverse
   showIcons: true
   nerdFontsVersion: "3"
-#git:
-#  pagers:
-#    - colorArg: always
-#      pager: delta --dark --paging=never
+
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+
 keybinding:
   universal:
     quit: "q"
     return: "<esc>"
+
 confirmOnQuit: false
+

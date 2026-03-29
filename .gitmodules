@@ -8,4 +8,4 @@
 	pushurl = git@github.com:JoverZhang/zsh-file-manager.git
 [submodule "dot_claude/skills-upstream"]
 	path = dot_claude/skills-upstream
-	url = https://github.com/mattpocock/skills.git
+	url = https://github.com/JoverZhang/mattpocock_skills.git

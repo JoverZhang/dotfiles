@@ -9,3 +9,5 @@
 [submodule "dot_claude/skills-upstream"]
 	path = dot_claude/skills-upstream
 	url = https://github.com/JoverZhang/mattpocock_skills.git
+	pushurl = git@github.com:JoverZhang/mattpocock_skills.git
+	branch = jover-patched

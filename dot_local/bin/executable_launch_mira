@@ -1,20 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-sudo systemd-run --uid=mira --gid=mira --pty \
-  --working-directory=/home/mira \
-  --setenv=HOME=/home/mira --setenv=USER=mira --setenv=LOGNAME=mira \
-  --setenv=XDG_RUNTIME_DIR=/run/user/1001 \
-  -p ProtectSystem=strict \
-  -p ReadWritePaths=/home/mira \
-  -p PrivateTmp=yes \
-  -p NoNewPrivileges=yes \
-  -p MemoryMax=60G -p TasksMax=4096 -p CPUQuota=3100% \
-  -p Delegate=yes \
-  -p LockPersonality=yes \
-  -p ProtectKernelTunables=yes \
-  -p ProtectKernelModules=yes \
-  -p ProtectKernelLogs=yes \
-  -p RestrictSUIDSGID=yes \
-  -p RemoveIPC=yes \
-  /bin/zsh
+exec sudo -n /usr/local/sbin/launch-mira-root "${1:-daily}"
 

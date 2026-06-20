@@ -11,6 +11,7 @@
 .config/libinput-gestures.conf
 .config/picom.conf
 .config/gdb
+.hammerspoon
 
 # OS
 {{- $cfg := index .os .chezmoi.os -}}
@@ -31,3 +32,6 @@
 !.config/kitty
 {{ end }}
 
+{{ if and (hasKey $cfg "use_hammerspoon") ($cfg.use_hammerspoon) }}
+!.hammerspoon
+{{ end }}

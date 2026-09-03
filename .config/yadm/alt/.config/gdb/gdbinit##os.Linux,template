@@ -1,5 +1,5 @@
 ### GDB-Dashboard
-source {{ joinPath .chezmoi.homeDir ".config" "gdb" "gdb-dashboard" ".gdbinit" }}
+source {{ env.HOME }}/.config/gdb/gdb-dashboard/.gdbinit
 
 #define d-default
 #  dashboard -layout assembly breakpoints registers source stack threads variables

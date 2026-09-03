@@ -308,6 +308,8 @@ fzf-ls-cd-widget() {
 # zle -N fzf-ls-cd-widget
 # bindkey '^F' fzf-ls-cd-widget
 
+eval "$(ccmux completion zsh)"
+
 ##############################################################################
 
 # fpath

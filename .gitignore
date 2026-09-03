@@ -1,0 +1,11 @@
+/.local/share/yadm/
+/.local/share/chezmoi/
+/.config/yadm/config
+
+/.config/zsh/ohmyzsh/
+/.config/zsh/zsh-autosuggestions/
+/.config/zsh/zsh-syntax-highlighting/
+/.config/zsh/fzf/
+/.config/tmux/oh-my-tmux/
+/.config/tmux/plugins/
+/.config/gdb/gdb-dashboard/

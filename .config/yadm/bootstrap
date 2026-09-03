@@ -1,0 +1,129 @@
+#!/usr/bin/env bash
+
+# Initialize tracked submodules and install or update external shell tooling.
+# Optional dependency failures are reported at the end; submodule failures stop.
+
+set -uo pipefail
+
+log() {
+  printf '%s\n' "$*"
+}
+
+declare -a failures=()
+
+record_failure() {
+  local label="$1"
+  failures+=("$label")
+  log "WARNING: $label failed"
+}
+
+run_optional() {
+  local label="$1"
+  shift
+
+  if "$@"; then
+    return 0
+  fi
+
+  record_failure "$label"
+  return 0
+}
+
+clone_or_update() {
+  local dir="$1"
+  local repo="$2"
+  local name
+  name="$(basename "$dir")"
+
+  if [[ -d "$dir" ]]; then
+    if ! git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      record_failure "$name (existing path is not a Git worktree)"
+      return 0
+    fi
+
+    log "Updating $name"
+    run_optional "$name update" git -C "$dir" pull --ff-only
+    return 0
+  fi
+
+  if [[ -e "$dir" ]]; then
+    record_failure "$name (existing path is not a directory)"
+    return 0
+  fi
+
+  if ! mkdir -p "$(dirname "$dir")"; then
+    record_failure "$name parent directory creation"
+    return 0
+  fi
+
+  log "Cloning $name"
+  run_optional "$name clone" git clone --depth=1 --single-branch "$repo" "$dir"
+}
+
+if ! command -v yadm >/dev/null 2>&1; then
+  log "ERROR: yadm is required to initialize tracked submodules"
+  exit 1
+fi
+
+if ! cd "$HOME"; then
+  log "ERROR: cannot enter HOME: $HOME"
+  exit 1
+fi
+
+log "Synchronizing tracked submodules"
+if ! yadm submodule sync --recursive; then
+  log "ERROR: submodule sync failed"
+  exit 1
+fi
+
+log "Initializing tracked submodules"
+if ! yadm submodule update --init --recursive; then
+  log "ERROR: submodule initialization failed"
+  exit 1
+fi
+
+declare -a repos=(
+  "$HOME/.config/zsh/ohmyzsh|https://github.com/ohmyzsh/ohmyzsh.git"
+  "$HOME/.config/zsh/zsh-autosuggestions|https://github.com/zsh-users/zsh-autosuggestions.git"
+  "$HOME/.config/zsh/zsh-syntax-highlighting|https://github.com/zsh-users/zsh-syntax-highlighting.git"
+  "$HOME/.config/zsh/fzf|https://github.com/junegunn/fzf.git"
+  "$HOME/.config/tmux/oh-my-tmux|https://github.com/gpakosz/.tmux.git"
+  "$HOME/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm.git"
+)
+
+if [[ "$(uname -s)" == "Linux" ]]; then
+  repos+=("$HOME/.config/gdb/gdb-dashboard|https://github.com/cyrus-and/gdb-dashboard.git")
+fi
+
+for item in "${repos[@]}"; do
+  IFS='|' read -r dir repo <<<"$item"
+  clone_or_update "$dir" "$repo"
+done
+
+tpm="$HOME/.config/tmux/plugins/tpm"
+if [[ -d "$tpm/.git" ]]; then
+  if [[ -x "$tpm/bin/install_plugins" ]]; then
+    log "Running TPM install_plugins"
+    run_optional "TPM install_plugins" "$tpm/bin/install_plugins"
+  else
+    record_failure "TPM install_plugins (script is missing or not executable)"
+  fi
+
+  if [[ -x "$tpm/bin/update_plugins" ]]; then
+    log "Running TPM update_plugins all"
+    run_optional "TPM update_plugins" "$tpm/bin/update_plugins" all
+  else
+    record_failure "TPM update_plugins (script is missing or not executable)"
+  fi
+else
+  log "Skipping TPM commands because its repository is unavailable"
+fi
+
+if (( ${#failures[@]} > 0 )); then
+  log "Bootstrap completed with ${#failures[@]} optional failure(s):"
+  printf '  - %s\n' "${failures[@]}"
+else
+  log "Bootstrap completed successfully"
+fi
+
+exit 0

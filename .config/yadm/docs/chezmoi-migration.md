@@ -391,16 +391,36 @@ git grep -n -E '\{\{[^}]*chezmoi|\.chezmoi\.' -- ':!*.md'
 
 ```bash
 YADM_TEST_ROOT="$(mktemp -d)"
-mkdir -p "$YADM_TEST_ROOT/home/.config/yadm" "$YADM_TEST_ROOT/data"
+mkdir -p "$YADM_TEST_ROOT/home" "$YADM_TEST_ROOT/data"
 
-yadm \
-  --yadm-dir "$YADM_TEST_ROOT/home/.config/yadm" \
-  --yadm-data "$YADM_TEST_ROOT/data" \
-  clone -w "$YADM_TEST_ROOT/home" -b yadm --no-bootstrap \
+yadm_test() {
+  yadm \
+    --yadm-dir "$YADM_TEST_ROOT/home/.config/yadm" \
+    --yadm-data "$YADM_TEST_ROOT/data" \
+    "$@"
+}
+
+# 必须在 clone 之前写入 yadm 自身的配置文件。
+yadm_test config yadm.auto-alt false
+
+yadm_test clone -w "$YADM_TEST_ROOT/home" -b yadm --no-bootstrap \
   <repository-url-or-local-path>
+
+# clone 已结束，新进程会从 repo 的 core.worktree 读取临时 HOME。
+yadm_test alt
 ```
 
+这一步不能只向底层 `git clone` 传入 `-c yadm.auto-alt=false`；`yadm.auto-alt`
+读取的是 `$YADM_TEST_ROOT/home/.config/yadm/config`。yadm 3.5.0 在同一进程执行
+`clone -w` 后的自动 alternate 阶段仍可能以进程真实 `$HOME` 计算路径，因此必须在
+clone 前按上例关闭自动 alternate，再于 clone 完成后的新进程中显式运行 `yadm alt`。
+
 此隔离 clone 只验证 checkout、alternate、template、mode 和 symlink。不要在这里直接运行 bootstrap，因为 bootstrap 默认以进程真实 `$HOME` 为目标。完整 bootstrap 应在一次性用户、容器或 VM 中验证。
+
+OS 矩阵优先为每个场景创建新的 `YADM_TEST_ROOT`。yadm 3.5.0 会清理不再匹配的
+symlink alternate，但不会自动删除先前渲染的普通模板输出；如果复用同一测试根从
+Linux 切回 Darwin，应先将临时的 `.config/gdb/gdbinit` 移出 worktree，再运行
+`yadm_test alt`。真实 HOME 遇到同类情况时也只能先备份，不能直接删除。
 
 分别验证：
 
@@ -414,7 +434,8 @@ yadm \
 
 #### Linux，无 Desktop class
 
-在临时 yadm 配置中执行 `yadm config local.os Linux`，然后运行 `yadm alt`：
+在临时 yadm 配置中执行 `yadm_test config local.os Linux`，然后运行
+`yadm_test alt`：
 
 - proxychains 端口为 `7890`。
 - GDB 存在且 `env.HOME` 已渲染。
@@ -422,7 +443,7 @@ yadm \
 
 #### Linux，Desktop class
 
-再添加 `local.class=Desktop` 并运行 `yadm alt`：
+再执行 `yadm_test config local.class Desktop` 和 `yadm_test alt`：
 
 - i3、Polybar、XFCE4、picom、libinput-gestures 全部存在。
 - Polybar 脚本 executable bit 正确。
@@ -479,7 +500,7 @@ yadm \
 迁移仅在全部满足时视为完成：
 
 - `yadm status` 干净。
-- `yadm submodule status --recursive` 成功。
+- 从 `$YADM_TEST_ROOT/home` 运行 `yadm_test submodule status --recursive` 成功。
 - 当前 OS 不应部署的 alternate 目标不存在。
 - `proxychains.conf` 端口与 OS 匹配。
 - `.config/tmux/tmux.conf` 是预期相对 symlink。

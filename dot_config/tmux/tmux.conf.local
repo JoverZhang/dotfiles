@@ -421,8 +421,8 @@ bind C-j select-pane -D
 bind v split-pane -h -c "#{pane_current_path}"
 bind s split-pane -v -c "#{pane_current_path}"
 # move pane
-bind j command-prompt -p "send pane to:"  "join-pane -t '%%'"
-bind J command-prompt -p "join pane from:"  "join-pane -s '%%'"
+bind j choose-tree -Zw "join-pane -t '%%'"
+bind J choose-tree -Zw "join-pane -s '%%'"
 
 # window navigation
 bind -n M-1 select-window -t 1

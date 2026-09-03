@@ -65,26 +65,28 @@ tmux_conf_24b_colour=auto
 #   - tmux_conf_theme_mouse
 #   - tmux_conf_theme_root
 #   - tmux_conf_theme_synchronized
+# Keep oh-my-tmux theming enabled for its built-in status helpers, including
+# native battery detection. Catppuccin's Mocha palette is applied below.
 tmux_conf_theme=enabled
 
-# default theme
-tmux_conf_theme_colour_1="#080808"    # dark gray
-tmux_conf_theme_colour_2="#303030"    # gray
-tmux_conf_theme_colour_3="#8a8a8a"    # light gray
-tmux_conf_theme_colour_4="#00afff"    # light blue
-tmux_conf_theme_colour_5="#ffff00"    # yellow
-tmux_conf_theme_colour_6="#080808"    # dark gray
-tmux_conf_theme_colour_7="#e4e4e4"    # white
-tmux_conf_theme_colour_8="#080808"    # dark gray
-tmux_conf_theme_colour_9="#ff6d00"    # orange
-tmux_conf_theme_colour_10="#ff00af"   # pink
-tmux_conf_theme_colour_11="#5fff00"   # green
-tmux_conf_theme_colour_12="#8a8a8a"   # light gray
-tmux_conf_theme_colour_13="#e4e4e4"   # white
-tmux_conf_theme_colour_14="#080808"   # dark gray
-tmux_conf_theme_colour_15="#080808"   # dark gray
-tmux_conf_theme_colour_16="#d70000"   # red
-tmux_conf_theme_colour_17="#e4e4e4"   # white
+# Catppuccin Mocha palette
+tmux_conf_theme_colour_1="#1e1e2e"    # base
+tmux_conf_theme_colour_2="#313244"    # surface 0
+tmux_conf_theme_colour_3="#a6adc8"    # subtext 0
+tmux_conf_theme_colour_4="#89b4fa"    # blue
+tmux_conf_theme_colour_5="#f9e2af"    # yellow
+tmux_conf_theme_colour_6="#11111b"    # crust
+tmux_conf_theme_colour_7="#cdd6f4"    # text
+tmux_conf_theme_colour_8="#11111b"    # crust
+tmux_conf_theme_colour_9="#fab387"    # peach
+tmux_conf_theme_colour_10="#cba6f7"   # mauve
+tmux_conf_theme_colour_11="#a6e3a1"   # green
+tmux_conf_theme_colour_12="#a6adc8"   # subtext 0
+tmux_conf_theme_colour_13="#cdd6f4"   # text
+tmux_conf_theme_colour_14="#11111b"   # crust
+tmux_conf_theme_colour_15="#181825"   # mantle
+tmux_conf_theme_colour_16="#f38ba8"   # red
+tmux_conf_theme_colour_17="#b4befe"   # lavender
 
 # default theme (ansi)
 #tmux_conf_theme_colour_1="colour0"
@@ -255,9 +257,10 @@ tmux_conf_theme_right_separator_sub='\uE0B3'
 #     - #{uptime_s}
 #     - #{username}
 #     - #{username_ssh}
-# tmux_conf_theme_status_left=" ❐ #S | ↑#{?uptime_y, #{uptime_y}y,}#{?uptime_d, #{uptime_d}d,}#{?uptime_h, #{uptime_h}h,}#{?uptime_m, #{uptime_m}m,} "
-tmux_conf_theme_status_left=" #{?client_prefix,Ω,ω} [#S] "
-tmux_conf_theme_status_right=" #{prefix}#{mouse}#{pairing}#{synchronized}#{?battery_status,#{battery_status},}#{?battery_bar, #{battery_bar},}#{?battery_percentage, #{battery_percentage},} , %R , %d %b | #{root}#{username}#{root} | #{hostname} "
+# These values keep oh-my-tmux's native battery updater enabled. The rendered
+# status modules are replaced with the Catppuccin-style formats below.
+tmux_conf_theme_status_left="#S"
+tmux_conf_theme_status_right="#{?battery_status,#{battery_status},}#{?battery_percentage,#{battery_percentage},}"
 
 # status left style
 tmux_conf_theme_status_left_fg="$tmux_conf_theme_colour_6,$tmux_conf_theme_colour_8"
@@ -335,8 +338,8 @@ tmux_conf_battery_vbar_palette="gradient"
 # tmux_conf_battery_status_charging="↑"       # U+2191
 # tmux_conf_battery_status_discharging="↓"    # U+2193
 # tmux_conf_battery_status_charging="🔌"     # U+1F50C
-tmux_conf_battery_status_charging="⚡"
-tmux_conf_battery_status_discharging="🔋"
+tmux_conf_battery_status_charging="󰂄"
+tmux_conf_battery_status_discharging="󰂃"
 
 # clock style (when you hit <prefix> + t)
 # you may want to use %I:%M %p in place of %R in tmux_conf_theme_status_right
@@ -520,8 +523,22 @@ bind -T copy-mode-vi TripleClick1Pane \
 
 
 
-# move status line to top
-#set -g status-position top
+# Keep the status line at the bottom and reproduce Catppuccin's rounded tabs
+# and icon/text status modules without loading the plugin. These are reapplied
+# after oh-my-tmux generates its theme.
+set -g @mocha_status_session '#[fg=#{?client_prefix,#f38ba8,#a6e3a1},bg=#1e1e2e]#[fg=#11111b,bg=#{?client_prefix,#f38ba8,#a6e3a1},bold] #[fg=#cdd6f4,bg=#313244,nobold] #S #[fg=#313244,bg=#1e1e2e] '
+set -g @mocha_status_host '#[fg=#cba6f7,bg=#1e1e2e]#[fg=#11111b,bg=#cba6f7]󰒋 #[fg=#cdd6f4,bg=#313244] #H#[fg=#313244,bg=#1e1e2e] '
+set -g @mocha_status_directory '#[fg=#f5e0dc,bg=#1e1e2e]#[fg=#11111b,bg=#f5e0dc] #[fg=#cdd6f4,bg=#313244] #{b:pane_current_path} #[fg=#313244,bg=#1e1e2e] '
+set -g @mocha_status_battery '#[fg=#b4befe,bg=#1e1e2e]#[fg=#11111b,bg=#b4befe]#{?#{==:#{@battery_status},󰂄},󰂄,#{?#{>=:#{@battery_percentage},90},󰁹,#{?#{>=:#{@battery_percentage},80},󰂁,#{?#{>=:#{@battery_percentage},70},󰁿,#{?#{>=:#{@battery_percentage},60},󰁾,#{?#{>=:#{@battery_percentage},50},󰁽,#{?#{>=:#{@battery_percentage},40},󰁼,#{?#{>=:#{@battery_percentage},30},󰁻,󰁺}}}}}}}} #[fg=#cdd6f4,bg=#313244] #{@battery_percentage}#[fg=#313244,bg=#1e1e2e] '
+set -g @mocha_status_date_time '#[fg=#74c7ec,bg=#1e1e2e]#[fg=#11111b,bg=#74c7ec]󰃰 #[fg=#cdd6f4,bg=#313244] %H:%M#[fg=#313244,bg=#1e1e2e] '
+set -g status-position bottom #!important
+set -g status-left-length 100 #!important
+set -g status-right-length 160 #!important
+set -g status-left '#{E:@mocha_status_session}#{E:@mocha_status_directory}' #!important
+set -g status-right '#(nice cut -c3- ~/.config/tmux/tmux.conf | sh -s _battery_status 󰂄 󰂃)#{E:@mocha_status_host}#{E:@mocha_status_date_time}#{?@battery_percentage,#{E:@mocha_status_battery},}' #!important
+set -g window-status-separator ' ' #!important
+set -g window-status-format '#[fg=#313244,bg=#1e1e2e]#[fg=#cdd6f4,bg=#313244] #W#{?window_bell_flag, 󰂞,}#{?window_zoomed_flag, 󰁌,}#[fg=#89b4fa,bg=#313244] █#[fg=#313244,bg=#89b4fa]#I#[fg=#89b4fa,bg=#1e1e2e]' #!important
+set -g window-status-current-format '#[fg=#1e1e2e,bg=#1e1e2e]#[fg=#cdd6f4,bg=#1e1e2e] #W#{?window_bell_flag, 󰂞,}#{?window_zoomed_flag, 󰁌,}#[fg=#fab387,bg=#1e1e2e] █#[fg=#1e1e2e,bg=#fab387]#I#[fg=#fab387,bg=#1e1e2e]' #!important
 
 
 # -- tpm -----------------------------------------------------------------------

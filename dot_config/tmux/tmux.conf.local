@@ -521,6 +521,9 @@ bind -T copy-mode-vi TripleClick1Pane \
   run-shell "sleep 0.1" \; \
   send-keys -X copy-selection
 
+### === Extend
+
+bind-key -n M-c display-popup -E -w 80% -h 75% "ccmux"
 
 
 # Keep the status line at the bottom and reproduce Catppuccin's rounded tabs

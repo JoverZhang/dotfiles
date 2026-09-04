@@ -158,8 +158,4 @@ tcp_connect_time_out 8000
 # add proxy here ...
 # meanwile
 # defaults set to "tor"
-{% if yadm.os == "Darwin" %}
-socks5 127.0.0.1 7981
-{% else %}
 socks5 127.0.0.1 7890
-{% endif %}

@@ -1,5 +1,5 @@
 ### GDB-Dashboard
-source {{ env.HOME }}/.config/gdb/gdb-dashboard/.gdbinit
+source /home/jover/.config/gdb/gdb-dashboard/.gdbinit
 
 #define d-default
 #  dashboard -layout assembly breakpoints registers source stack threads variables

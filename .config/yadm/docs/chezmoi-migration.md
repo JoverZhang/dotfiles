@@ -1,22 +1,26 @@
 # 从 chezmoi 迁移到 yadm
 
-> 状态：方案草案，尚未执行迁移
+> 状态：yadm 架构已在 macOS 验证并启用；Linux 主机待按第 12 节切换
 >
-> 最后审阅：2026-09-03
+> 最后审阅：2026-09-04
 >
 > 原则：保留 Git 历史、不重写提交、不在验证前改变现有 dotfiles 的管理方式
 
 ## 1. 结论
 
-采用一个长期存在的 `yadm` 分支，从当前 chezmoi `master` 分出：
+迁移先在独立的 `yadm` 分支完成和验证，验证通过后将其 fast-forward 合入
+`master`。最终分支策略为：
 
-- `master` 保留为最后可工作的 chezmoi 版本和回滚入口。
-- `yadm` 包含一次普通的目录/语义转换提交以及后续 yadm 配置。
+- `master` 是后续日常使用的 yadm 分支，新机器从这里 clone。
+- `chezmoi-final-20260903` tag 指向最后可工作的 chezmoi 提交，是旧架构回滚入口。
+- `yadm` 保留为迁移过程分支；确认所有机器均使用 `master` 后可以再删除。
 - 不使用 `git filter-branch`、`git filter-repo` 或 force-push。
-- 迁移期间在单独的 Git worktree 中修改 `yadm` 分支，当前 chezmoi 工作目录继续停留在 `master`，避免影响日常使用。
-- 验证通过后，正式机器通过 `yadm clone -b yadm` 使用新分支。是否将远端默认分支改为 `yadm`，留到稳定运行后决定。
+- 新机器通过 `yadm clone -b master --no-bootstrap` 分阶段切换。
 
-这个方案保留完整历史，但存在一个明确边界：`yadm` 分支中，转换提交之前的提交仍然采用 `dot_config`、`executable_` 等 chezmoi source-state 命名。因此，不能在真实 `$HOME` yadm worktree 中直接 checkout 转换前的提交；查看旧历史应使用普通 Git clone/worktree。
+这个方案保留完整历史，但存在一个明确边界：`master` 中的转换提交之前仍然采用
+`dot_config`、`executable_` 等 chezmoi source-state 命名。因此，不能在真实 `$HOME`
+yadm worktree 中直接 checkout 转换前的提交；查看旧历史应使用普通 Git
+clone/worktree。
 
 ## 2. 目标与非目标
 
@@ -60,9 +64,10 @@
 - 保留 Neovim 当前状态：`lazy-lock.json` 已提交为 `bdd35c7`，父仓库已在 `b6594b1` 更新 gitlink。
 - `dot_claude/skills-upstream` 孤立 gitlink 已在 `b6594b1` 删除。
 - GDB 模板问题已在 `f8ffea4` 修复。
-- 本文档收录在最后的 chezmoi `master` 基线中。
+- 本文档收录在最后的 chezmoi 基线提交 `23d6ef8` 中。
 
-以上提交均未推送。Neovim 的 `bdd35c7` 必须先由用户手动推送到 `neovim-config`，然后才能推送引用它的 dotfiles 父仓库提交和 final tag。
+Neovim 的 `bdd35c7`、dotfiles 的 chezmoi 基线以及
+`chezmoi-final-20260903` tag 均已由用户推送，构成可用的远端回滚点。
 
 在创建 `yadm` 基线之前，必须达到：
 
@@ -86,18 +91,20 @@ source {{ .chezmoi.homeDir }}.config/gdb/gdb-dashboard/.gdbinit
 
 ## 4. 分支与历史策略
 
-### 4.1 推荐拓扑
+### 4.1 最终拓扑
 
 ```text
-... existing history ... -- C  master, tag: chezmoi-final-YYYYMMDD
-                          \
-                           M1 -- M2 -- M3  yadm
+... existing history ... -- C -- M1 -- M2 -- M3 -- M4 -- D  master
+                           ^                       ^
+                           |                       yadm（迁移分支）
+                           tag: chezmoi-final-20260903
 ```
 
 - `C`：修复 submodule 状态后，最后一个完整可用的 chezmoi 提交。
 - `M1`：机械路径、文件模式和 submodule 路径转换。
 - `M2`：alternates、templates 和 OS/class 语义转换。
-- `M3`：bootstrap、ignore 规则、使用说明和验证修正。
+- `M3`/`M4`：bootstrap、ignore 规则和验证修正。
+- `D`：将文档和新机器操作入口切换为 `master`。
 
 建议先创建 tag 和分支，再创建独立 worktree；以下命令仅作为执行阶段参考，本方案阶段不运行：
 
@@ -107,20 +114,17 @@ git branch yadm
 git worktree add <temporary-worktree-path> yadm
 ```
 
-### 4.2 稳定后的分支选择
+### 4.2 日常分支选择
 
-优先保持：
+最终约定：
 
-- `master`：chezmoi 归档分支。
-- `yadm`：日常使用分支。
-- 新机器明确执行 `yadm clone -b yadm ...`。
+- `master`：yadm 日常使用和远端默认分支。
+- `chezmoi-final-20260903`：chezmoi 归档 tag。
+- `yadm`：临时迁移分支，不再承载后续提交。
+- 新机器明确执行 `yadm clone -b master ...`。
 
-稳定运行一段时间后可二选一：
-
-1. 将远端默认分支改为 `yadm`，继续保留 `master`；这是推荐方案。
-2. 将 `master` fast-forward 到 `yadm`，依靠 `chezmoi-final-*` tag 保存旧入口。
-
-两种方式都不需要重写历史或 force-push。
+合并只使用 `git merge --ff-only yadm`，推送也不需要 force。确认远端 `master`
+和各机器均已切换后，再决定是否删除 `yadm` 分支。
 
 ## 5. yadm 仓库布局
 
@@ -151,7 +155,7 @@ $HOME/
 
 yadm 自身的 bare repository 位于 `.local/share/yadm/repo.git`，绝不能被 yadm 仓库再次跟踪。
 
-当前方案文档暂存在 `.docs/yadm-migration.md`，因为隐藏目录不会被现有 chezmoi 当作 target。转换到 `yadm` 分支时，应将它移动为 `.config/yadm/docs/chezmoi-migration.md`。
+本文档已随转换移动到 `.config/yadm/docs/chezmoi-migration.md`。
 
 ## 6. 路径转换
 
@@ -403,7 +407,7 @@ yadm_test() {
 # 必须在 clone 之前写入 yadm 自身的配置文件。
 yadm_test config yadm.auto-alt false
 
-yadm_test clone -w "$YADM_TEST_ROOT/home" -b yadm --no-bootstrap \
+yadm_test clone -w "$YADM_TEST_ROOT/home" -b master --no-bootstrap \
   <repository-url-or-local-path>
 
 # clone 已结束，新进程会从 repo 的 core.worktree 读取临时 HOME。
@@ -459,10 +463,12 @@ Linux 切回 Darwin，应先将临时的 `.config/gdb/gdbinit` 移出 worktree�
 
 ### 阶段 5：真实机器切换
 
-切换前生成双重回滚点：
+切换前准备两类回滚点：
 
 - 已推送的 `chezmoi-final-*` tag。
-- 使用 `chezmoi archive --output=<outside-home-backup>.tar.gz` 保存当前渲染 target state。
+- 将本次会被替换的 submodule 目录和 alternate 目标定点备份到 `$HOME` 外。
+- `chezmoi archive` 是可选的额外保险；当 chezmoi 状态干净、基线和 tag 均已推送时，
+  它不是切换的前置条件。
 
 切换原则：
 
@@ -473,10 +479,10 @@ Linux 切回 Darwin，应先将临时的 `.config/gdb/gdbinit` 移出 worktree�
    yadm config yadm.auto-alt false
    ```
 
-3. 不使用 `-f`，clone `yadm` 分支且不运行 bootstrap：
+3. 不使用 `-f`，clone `master` 且不运行 bootstrap：
 
    ```bash
-   yadm clone -b yadm --no-bootstrap git@github.com:JoverZhang/dotfiles.git
+   yadm clone -b master --no-bootstrap git@github.com:JoverZhang/dotfiles.git
    ```
 
 4. 用 `yadm status`/`yadm diff` 处理直接跟踪文件与现有 `$HOME` 文件的差异。
@@ -493,7 +499,99 @@ Linux 切回 Darwin，应先将临时的 `.config/gdb/gdbinit` 移出 worktree�
 9. 显式执行 `yadm bootstrap`。
 10. 打开新 shell，验证 zsh、tmux、Neovim 和相关 GUI 配置。
 
-至少稳定运行数天后，才考虑更改远端默认分支或清理旧 chezmoi 环境。
+至少稳定运行数天后，才清理旧 chezmoi 环境、定点备份或 `yadm` 迁移分支。
+
+### 12.1 Linux 主机切换清单
+
+以下步骤适用于仍由 chezmoi 管理、尚未初始化 yadm 的 Linux。先确认远端
+`master` 已包含迁移提交，再开始：
+
+1. 确认旧状态干净，并检查 bootstrap 管理的第三方仓库是否有本地修改：
+
+   ```bash
+   chezmoi status
+   git -C "$HOME/.local/share/chezmoi" status --short
+   ```
+
+   两项应无输出。第三方仓库若有修改，先导出 patch 或单独备份；bootstrap 使用
+   `git pull --ff-only`，不会 reset 本地修改，但更新可能失败并被列入最终摘要。
+
+2. 安装 yadm，关闭自动 alternate，然后安全 clone：
+
+   ```bash
+   yadm config yadm.auto-alt false
+   test "$(yadm config --bool yadm.auto-alt)" = false
+   yadm clone -b master --no-bootstrap \
+     git@github.com:JoverZhang/dotfiles.git
+   yadm status --short
+   ```
+
+   clone 提示 HOME 中已有不同文件是预期的；不要执行 `yadm checkout "$HOME"`。
+   先逐项核对差异。
+
+3. 在 `$HOME` 外创建 mode `0700` 的定点备份目录，并移动以下已存在目标：
+
+   - 两个普通目录：`.config/nvim`、`.config/zsh/zsh-file-manager`。
+   - 通用 alternate 目标：`.config/proxychains/proxychains.conf`。
+   - Linux alternate 目标：`.config/gdb/gdbinit`。
+   - 若为桌面机，再处理这些具体目标：
+     - `.config/i3/config`
+     - `.config/i3/jover/autostart.conf`
+     - `.config/i3/jover/black-2880x1800.png`
+     - `.config/i3/jover/i3status.conf`
+     - `.config/polybar/config.ini`
+     - `.config/polybar/launch.sh`
+     - `.config/polybar/scripts/nvidia-state.sh`
+     - `.config/polybar/scripts/toggle-cpu.sh`
+     - `.config/polybar/test-fonts.py`
+     - `.config/xfce4/terminal/accels.scm`
+     - `.config/xfce4/terminal/terminalrc`
+     - `.config/libinput-gestures.conf`
+     - `.config/picom.conf`
+
+   只移动清单中的文件或两个明确的 submodule 目录，不要整体移动 `.config`、i3、
+   Polybar、XFCE4 或 GDB 目录，因为其中可能有不受 yadm 管理的运行时文件。
+
+4. 设置机器 class。桌面 Linux 使用：
+
+   ```bash
+   yadm config --replace-all local.class Desktop
+   ```
+
+   服务器或无 GUI Linux 不设置 class；若曾设置过，执行：
+
+   ```bash
+   yadm config --unset-all local.class
+   ```
+
+5. 初始化 submodule，再显式生成 alternates：
+
+   ```bash
+   cd "$HOME"
+   yadm submodule sync --recursive
+   yadm submodule update --init --recursive
+   yadm alt
+   yadm status --short
+   ```
+
+6. 验证 Linux 结果：proxychains 端口为 `7890`；GDB 首行含当前 `$HOME`；
+   Kitty 和 Hammerspoon 的 Darwin 目标没有被创建；桌面机的 i3/Polybar/XFCE4、
+   picom 和 libinput-gestures 目标存在。确认无误后启用自动 alternate：
+
+   ```bash
+   yadm config yadm.auto-alt true
+   yadm alt
+   ```
+
+7. 最后运行依赖同步并做启动检查：
+
+   ```bash
+   yadm bootstrap
+   yadm status --short
+   ```
+
+   新开 shell，并验证 zsh、tmux 和 Neovim；桌面机再验证相应 GUI 配置。稳定运行前
+   保留 chezmoi、`chezmoi-final-*` tag 和 `$HOME` 外的定点备份。
 
 ## 13. 验收标准
 
@@ -508,7 +606,8 @@ Linux 切回 Darwin，应先将临时的 `.config/gdb/gdbinit` 移出 worktree�
 - bootstrap 首次运行和第二次幂等运行均无关键失败。
 - zsh、tmux、Neovim 可正常启动。
 - `yadm list -a` 不包含插件 clone、yadm bare repo、chezmoi source repo、缓存或密钥。
-- chezmoi tag、target archive 和旧 `master` 均可用于回滚。
+- chezmoi tag 和 `$HOME` 外的定点备份均可用于回滚；若额外创建了 target archive，
+  也保留到稳定期结束。
 
 ## 14. 回滚
 
@@ -517,10 +616,11 @@ Linux 切回 Darwin，应先将临时的 `.config/gdb/gdbinit` 移出 worktree�
 1. 停止执行 yadm pull/checkout/bootstrap。
 2. 将 yadm 创建的 alternate symlink 或模板输出移动到隔离备份目录。
 3. 保留 `.local/share/yadm`，不要立即删除 bare repo。
-4. 确认 chezmoi source 位于 `master` 或 `chezmoi-final-*` tag 对应提交。
+4. 在普通 Git worktree 中从 `chezmoi-final-*` tag 恢复 chezmoi source；不要在真实
+   `$HOME` 的 yadm worktree checkout 该 tag。
 5. 先运行 `chezmoi diff`，确认结果后再运行 `chezmoi apply`。
 6. 若 target 内容仍不符合预期，从迁移前的 chezmoi archive 恢复。
-7. 若已改变远端默认分支，将其改回 `master`。
+7. 远端 `master` 保留 yadm 历史；不需要为本机回滚强推或改写远端分支。
 
 只有在回滚验证完成或 yadm 长期稳定后，才清理临时 worktree、备份或旧管理器数据。
 

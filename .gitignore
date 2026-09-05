@@ -1,4 +1,6 @@
-/.local/share/yadm/
+/.local/share/yadm/*
+!/.local/share/yadm/archive
+/.local/bin/launch_mira
 /.local/share/chezmoi/
 /.local/share/dotfiles-backups/
 /.config/chezmoi/

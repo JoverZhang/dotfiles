@@ -1,5 +1,0 @@
-#!/usr/bin/env bash
-set -euo pipefail
-
-exec sudo -n /usr/local/sbin/launch-mira-root "${1:-daily}"
-

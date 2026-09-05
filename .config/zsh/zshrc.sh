@@ -1,4 +1,4 @@
-export DOT_FILES="$HOME/DotFiles"
+unset DOT_FILES
 ZSH_ROOT=$(dirname $0)
 
 # If you come from bash you might have to change your $PATH.
@@ -186,7 +186,8 @@ alias mv='mv -i'
 # Environments
 export WS="$HOME/Workspace"
 export EDITOR='nvim'
-export PATH="$HOME/DotFiles/bin:$HOME/Tools/bin:/snap/bin/:$PATH:$HOME/.cargo/bin"
+path=("${(@)path:#$HOME/DotFiles/bin}")
+export PATH="$HOME/.local/bin:$HOME/Tools/bin:/snap/bin/:$PATH:$HOME/.cargo/bin"
 
 # # Proxy Enable
 # export http_proxy=http://127.0.0.1:8889

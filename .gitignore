@@ -1,5 +1,7 @@
 /.local/share/yadm/
 /.local/share/chezmoi/
+/.local/share/dotfiles-backups/
+/.config/chezmoi/
 /.config/yadm/config
 
 /.config/zsh/ohmyzsh/

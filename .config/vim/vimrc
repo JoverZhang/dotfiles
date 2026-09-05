@@ -1,0 +1,2 @@
+" Keep the existing defaults; vimrc.vim is an optional legacy configuration.
+source $VIMRUNTIME/defaults.vim

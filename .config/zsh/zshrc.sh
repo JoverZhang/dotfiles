@@ -4,6 +4,9 @@ ZSH_ROOT=${${(%):-%N}:A:h}
 DOTFILES_ZSH_PERSONAL=true
 [[ -r "$ZSH_ROOT/profile.zsh" ]] && source "$ZSH_ROOT/profile.zsh"
 
+typeset -U path PATH
+path=("$HOME/.local/bin" $path)
+
 export ZSH="$ZSH_ROOT/ohmyzsh"
 export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/oh-my-zsh"
 export EDITOR="${EDITOR:-nvim}"
@@ -159,4 +162,7 @@ typeset -U path
 
 (( $+commands[ccmux] )) && eval "$(ccmux completion zsh)"
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
+if [[ -o zle && -t 0 && -t 1 ]] && (( $+commands[navi] )); then
+  eval "$(navi widget zsh)"
+fi
 return 0

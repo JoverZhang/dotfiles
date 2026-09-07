@@ -5,6 +5,7 @@
 /.local/share/dotfiles-backups/
 /.config/chezmoi/
 /.config/yadm/config
+/.config/zsh/local.zsh
 /.local/share/antidote/
 /.cache/antidote/
 

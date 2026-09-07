@@ -67,6 +67,8 @@ if [ -z "$ZSH_THEME" ]; then
 fi
 
 plugins=(git docker kubectl)
+# OMZ's version is recorded by dotfiles; use dotfiles-submodules to update it.
+zstyle ':omz:update' mode disabled
 if [[ -r "$ZSH/oh-my-zsh.sh" ]]; then
   source "$ZSH/oh-my-zsh.sh"
 else
@@ -94,15 +96,19 @@ else
   zstyle ':fzf-tab:complete:cd:*' fzf-preview 'command ls --color=always -la -- "$realpath"'
 fi
 
+# Antidote owns external plugins; only its manager is a dotfiles submodule.
+export ANTIDOTE_HOME=${ANTIDOTE_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/antidote}
+zstyle ':antidote:bundle' file "$ZSH_ROOT/plugins.txt"
+zstyle ':antidote:static' file "${XDG_CACHE_HOME:-$HOME/.cache}/antidote/plugins.zsh"
+[[ -r "$ZSH_ROOT/antidote/antidote.zsh" ]] && source "$ZSH_ROOT/antidote/antidote.zsh"
+
 # Widgets require a line editor; zsh -ic automation may have none.
 if [[ -o zle && -t 0 && -t 1 ]]; then
   # Load fzf exactly once, then fzf-tab before plugins that wrap ZLE widgets.
   if (( $+commands[fzf] )); then
     source <(fzf --zsh)
-    [[ -r "$ZSH_ROOT/fzf-tab/fzf-tab.plugin.zsh" ]] && source "$ZSH_ROOT/fzf-tab/fzf-tab.plugin.zsh"
   fi
-  [[ -r "$ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && source "$ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh"
-  [[ -r "$ZSH_ROOT/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] && source "$ZSH_ROOT/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  (( $+functions[antidote] )) && antidote load
   [[ -r "$ZSH/plugins/history-substring-search/history-substring-search.plugin.zsh" ]] && source "$ZSH/plugins/history-substring-search/history-substring-search.plugin.zsh"
 
   if (( ${+widgets[fzf-history-widget]} )); then
@@ -150,6 +156,8 @@ if [[ "$DOTFILES_ZSH_PERSONAL" == true ]]; then
 fi
 # Account-specific environment and aliases, selected by yadm alternates.
 [[ -r "$ZSH_ROOT/local.zsh" ]] && source "$ZSH_ROOT/local.zsh"
+path=("$HOME/.local/bin" $path)
+typeset -U path
 
 (( $+commands[ccmux] )) && eval "$(ccmux completion zsh)"
 (( $+commands[zoxide] )) && eval "$(zoxide init zsh)"

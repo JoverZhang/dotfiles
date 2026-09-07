@@ -30,8 +30,7 @@ yadm config yadm.auto-alt true
 yadm bootstrap
 ```
 
-This installs all tracked submodules and external shell/tmux dependencies,
-plus gdb-dashboard on Linux.
+This initializes all tracked submodules, plus gdb-dashboard on Linux.
 
 ## zsh and tmux Only
 
@@ -57,9 +56,11 @@ yadm bootstrap
 ## Use and Update
 
 Start a new zsh session with `exec zsh`, then run `tmux` when needed.
+Antidote installs the zsh plugins on the first interactive startup. In tmux,
+press `Ctrl-A`, then `I` to install plugins with TPM.
 `yadm status --short` shows local changes and is empty after a clean installation.
 
-To update dotfiles and their dependencies:
+To update dotfiles and synchronize their recorded framework versions:
 
 ```bash
 yadm pull --ff-only
@@ -67,4 +68,21 @@ yadm bootstrap
 ```
 
 Bootstrap uses the saved `local.components` selection, or `all` when unset.
-It downloads dependencies; system packages are installed separately.
+System packages are installed and updated separately.
+
+Use `dotfiles-submodules` to manage framework versions:
+
+```bash
+dotfiles-submodules status
+dotfiles-submodules update omz tpm   # fetch newer upstream versions
+```
+
+`dotfiles-submodules pin NAME TAG_OR_COMMIT` selects a specific version.
+`dotfiles-submodules sync omz tpm` restores the recorded versions.
+Names include `omz`, `oh-my-tmux`, `tpm`, and `antidote`. Changes are left
+unstaged: review with `yadm diff --submodule=log`, then use `yadm add` and
+`yadm commit` to record the selected versions. Run `dotfiles-submodules --help`
+for usage from a normal Git checkout.
+
+Update zsh plugins with `antidote update --bundles`; update tmux plugins with
+`Ctrl-A`, then `u`. Plugin versions are maintained by their plugin managers.

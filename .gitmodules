@@ -6,3 +6,19 @@
 	path = .config/zsh/zsh-file-manager
 	url = https://github.com/JoverZhang/zsh-file-manager.git
 	pushurl = git@github.com:JoverZhang/zsh-file-manager.git
+[submodule "omz"]
+	path = .config/zsh/ohmyzsh
+	url = https://github.com/ohmyzsh/ohmyzsh.git
+	shallow = true
+[submodule "oh-my-tmux"]
+	path = .config/tmux/oh-my-tmux
+	url = https://github.com/gpakosz/.tmux.git
+	shallow = true
+[submodule "tpm"]
+	path = .config/tmux/plugins/tpm
+	url = https://github.com/tmux-plugins/tpm.git
+	shallow = true
+[submodule "antidote"]
+	path = .config/zsh/antidote
+	url = https://github.com/mattmc3/antidote.git
+	shallow = true

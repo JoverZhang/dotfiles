@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Restore recorded framework versions. Plugins are managed by Antidote and TPM.
+# Install OMZ once and restore recorded submodules. Antidote and TPM own plugins.
 set -eo pipefail
 
 die() { printf 'bootstrap: %s\n' "$*" >&2; exit 1; }
@@ -32,7 +32,7 @@ if selected_component zsh; then
   command -v zsh >/dev/null 2>&1 || die 'install zsh with your package manager'
   command -v fzf >/dev/null 2>&1 && fzf --zsh >/dev/null 2>&1 ||
     die 'install fzf 0.48.0 or newer with your package manager'
-  modules+=(omz antidote)
+  modules+=(antidote)
 fi
 if selected_component tmux; then
   command -v tmux >/dev/null 2>&1 || die 'install tmux with your package manager'
@@ -42,6 +42,18 @@ if selected_component submodules; then
   "$target/.local/bin/dotfiles-submodules" sync --all
 elif (( ${#modules[@]} > 0 )); then
   "$target/.local/bin/dotfiles-submodules" sync "${modules[@]}"
+fi
+
+# OMZ manages its own updates; bootstrap only installs it when missing.
+if selected_component zsh; then
+  omz="$target/.config/zsh/ohmyzsh"
+  if [[ ! -e "$omz" && ! -L "$omz" ]]; then
+    mkdir -p "$target/.config/zsh"
+    git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$omz"
+  elif [[ ! -e "$omz/.git" ]] ||
+       [[ $(git -C "$omz" rev-parse --show-toplevel 2>/dev/null) != "$omz" ]]; then
+    die "existing path is not an OMZ Git checkout: $omz"
+  fi
 fi
 
 # Preserve the existing optional Linux GDB-dashboard installation.

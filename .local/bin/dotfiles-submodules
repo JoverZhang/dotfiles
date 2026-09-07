@@ -20,8 +20,8 @@ unrelated existing directories. Nothing is staged or committed automatically.
 
 Examples:
   dotfiles-submodules status
-  dotfiles-submodules update omz tpm
-  dotfiles-submodules sync omz tpm
+  dotfiles-submodules update oh-my-tmux tpm
+  dotfiles-submodules sync oh-my-tmux tpm
   dotfiles-submodules pin tpm TAG_OR_COMMIT
 USAGE
 }

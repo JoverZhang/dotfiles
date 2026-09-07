@@ -67,8 +67,6 @@ if [ -z "$ZSH_THEME" ]; then
 fi
 
 plugins=(git docker kubectl)
-# OMZ's version is recorded by dotfiles; use dotfiles-submodules to update it.
-zstyle ':omz:update' mode disabled
 if [[ -r "$ZSH/oh-my-zsh.sh" ]]; then
   source "$ZSH/oh-my-zsh.sh"
 else

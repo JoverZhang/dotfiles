@@ -8,6 +8,7 @@
 /.local/share/antidote/
 /.cache/antidote/
 
+/.config/zsh/ohmyzsh/
 /.config/zsh/zsh-autosuggestions/
 /.config/zsh/zsh-syntax-highlighting/
 /.config/zsh/fzf-tab/

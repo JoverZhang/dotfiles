@@ -103,11 +103,10 @@ if selected_component zsh; then
     "$target/.config/zsh/zsh-syntax-highlighting|https://github.com/zsh-users/zsh-syntax-highlighting.git"
     "$target/.config/zsh/fzf-tab|https://github.com/Aloxaf/fzf-tab.git"
   )
-  # Modern fzf ships its shell integration in the installed binary. Older
-  # installations continue to use the tracked bootstrap's script checkout.
+  # fzf provides shell integration directly; no separate source checkout.
   if command -v fzf >/dev/null 2>&1; then
     if ! fzf --zsh >/dev/null 2>&1; then
-      repos+=("$target/.config/zsh/fzf|https://github.com/junegunn/fzf.git")
+      record_failure "fzf shell integration is unavailable; upgrade fzf to 0.48.0 or newer"
     fi
   else
     record_failure "fzf is missing; install it with your system package manager"

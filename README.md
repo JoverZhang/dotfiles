@@ -2,7 +2,7 @@
 
 Dotfiles for macOS and Linux, managed by yadm in `$HOME` on the `master` branch.
 
-Install Git, yadm, zsh, tmux, and fzf with your system package manager. The
+Install Git, yadm, zsh, tmux, and fzf 0.48.0+ with your system package manager. The
 commands below require GitHub SSH access. If using a fork, substitute its URL.
 
 Choose one installation method below for a fresh account without a yadm repository.

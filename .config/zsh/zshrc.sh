@@ -98,13 +98,7 @@ fi
 if [[ -o zle && -t 0 && -t 1 ]]; then
   # Load fzf exactly once, then fzf-tab before plugins that wrap ZLE widgets.
   if (( $+commands[fzf] )); then
-    autoload -Uz is-at-least
-    if is-at-least 0.48.0 "${${(s: :)$(fzf --version)}[1]}"; then
-      source <(fzf --zsh)
-    elif [[ -r "$ZSH_ROOT/fzf/shell/key-bindings.zsh" ]]; then
-      source "$ZSH_ROOT/fzf/shell/completion.zsh"
-      source "$ZSH_ROOT/fzf/shell/key-bindings.zsh"
-    fi
+    source <(fzf --zsh)
     [[ -r "$ZSH_ROOT/fzf-tab/fzf-tab.plugin.zsh" ]] && source "$ZSH_ROOT/fzf-tab/fzf-tab.plugin.zsh"
   fi
   [[ -r "$ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && source "$ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh"

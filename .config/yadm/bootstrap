@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Initialize tracked submodules and install or update external shell tooling.
-# Optional dependency failures are reported at the end; submodule failures stop.
+# Dependency failures are reported at the end; submodule failures stop.
 
 set -uo pipefail
 
@@ -36,7 +36,7 @@ clone_or_update() {
   name="$(basename "$dir")"
 
   if [[ -d "$dir" ]]; then
-    if ! git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    if [[ ! -e "$dir/.git" ]] || ! git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
       record_failure "$name (existing path is not a Git worktree)"
       return 0
     fi
@@ -61,38 +61,78 @@ clone_or_update() {
 }
 
 if ! command -v yadm >/dev/null 2>&1; then
-  log "ERROR: yadm is required to initialize tracked submodules"
+  log "ERROR: yadm is required to locate the work tree"
   exit 1
 fi
 
-if ! cd "$HOME"; then
-  log "ERROR: cannot enter HOME: $HOME"
-  exit 1
+# yadm bootstrap does not forward CLI arguments; selection is local config.
+# DOTFILES_COMPONENTS can override it for a single explicit bootstrap run.
+components=${DOTFILES_COMPONENTS:-$(yadm config local.components 2>/dev/null || true)}
+read -r -a selected <<< "${components:-all}"
+for component in "${selected[@]}"; do
+  case "$component" in
+    all|submodules|zsh|tmux|gdb) ;;
+    *) log "ERROR: unknown component: $component"; exit 1 ;;
+  esac
+done
+selected_component() {
+  local component
+  for component in "${selected[@]}"; do
+    [[ "$component" == all || "$component" == "$1" ]] && return 0
+  done
+  return 1
+}
+
+# Honor yadm's work tree, including an isolated restore made with clone -w.
+target=$(yadm rev-parse --show-toplevel) || exit 1
+cd "$target" || exit 1
+log "Selected components: ${selected[*]}"
+
+if selected_component submodules; then
+  log "Synchronizing tracked submodules"
+  yadm submodule sync --recursive || exit 1
+  log "Initializing tracked submodules"
+  yadm submodule update --init --recursive || exit 1
 fi
 
-log "Synchronizing tracked submodules"
-if ! yadm submodule sync --recursive; then
-  log "ERROR: submodule sync failed"
-  exit 1
+declare -a repos=()
+if selected_component zsh; then
+  repos+=(
+    "$target/.config/zsh/ohmyzsh|https://github.com/ohmyzsh/ohmyzsh.git"
+    "$target/.config/zsh/zsh-autosuggestions|https://github.com/zsh-users/zsh-autosuggestions.git"
+    "$target/.config/zsh/zsh-syntax-highlighting|https://github.com/zsh-users/zsh-syntax-highlighting.git"
+    "$target/.config/zsh/fzf-tab|https://github.com/Aloxaf/fzf-tab.git"
+  )
+  # Modern fzf ships its shell integration in the installed binary. Older
+  # installations continue to use the tracked bootstrap's script checkout.
+  if command -v fzf >/dev/null 2>&1; then
+    if ! fzf --zsh >/dev/null 2>&1; then
+      repos+=("$target/.config/zsh/fzf|https://github.com/junegunn/fzf.git")
+    fi
+  else
+    record_failure "fzf is missing; install it with your system package manager"
+  fi
 fi
-
-log "Initializing tracked submodules"
-if ! yadm submodule update --init --recursive; then
-  log "ERROR: submodule initialization failed"
-  exit 1
+if selected_component tmux; then
+  repos+=(
+    "$target/.config/tmux/oh-my-tmux|https://github.com/gpakosz/.tmux.git"
+    "$target/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm.git"
+  )
+  # Read the customization file directly: the main Oh My Tmux config loads it
+  # dynamically, which TPM's standalone config scanner does not follow. Using
+  # Git here also avoids starting or modifying the user's default tmux server.
+  while IFS= read -r plugin; do
+    if [[ "$plugin" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_.-]*/[a-zA-Z0-9_][a-zA-Z0-9_.-]*$ ]]; then
+      repos+=("$target/.config/tmux/plugins/${plugin##*/}|https://github.com/$plugin.git")
+    else
+      record_failure "unsupported @plugin '$plugin' (expected GitHub owner/repository)"
+    fi
+  done < <(awk '$1 ~ /^set(-option)?$/ && $2 == "-g" && $3 == "@plugin" {
+    gsub(/[\047\042]/, "", $4); print $4
+  }' "$target/.config/tmux/tmux.conf.local")
 fi
-
-declare -a repos=(
-  "$HOME/.config/zsh/ohmyzsh|https://github.com/ohmyzsh/ohmyzsh.git"
-  "$HOME/.config/zsh/zsh-autosuggestions|https://github.com/zsh-users/zsh-autosuggestions.git"
-  "$HOME/.config/zsh/zsh-syntax-highlighting|https://github.com/zsh-users/zsh-syntax-highlighting.git"
-  "$HOME/.config/zsh/fzf|https://github.com/junegunn/fzf.git"
-  "$HOME/.config/tmux/oh-my-tmux|https://github.com/gpakosz/.tmux.git"
-  "$HOME/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm.git"
-)
-
-if [[ "$(uname -s)" == "Linux" ]]; then
-  repos+=("$HOME/.config/gdb/gdb-dashboard|https://github.com/cyrus-and/gdb-dashboard.git")
+if selected_component gdb && [[ "$(uname -s)" == Linux ]]; then
+  repos+=("$target/.config/gdb/gdb-dashboard|https://github.com/cyrus-and/gdb-dashboard.git")
 fi
 
 for item in "${repos[@]}"; do
@@ -100,28 +140,10 @@ for item in "${repos[@]}"; do
   clone_or_update "$dir" "$repo"
 done
 
-tpm="$HOME/.config/tmux/plugins/tpm"
-if [[ -d "$tpm/.git" ]]; then
-  if [[ -x "$tpm/bin/install_plugins" ]]; then
-    log "Running TPM install_plugins"
-    run_optional "TPM install_plugins" "$tpm/bin/install_plugins"
-  else
-    record_failure "TPM install_plugins (script is missing or not executable)"
-  fi
-
-  if [[ -x "$tpm/bin/update_plugins" ]]; then
-    log "Running TPM update_plugins all"
-    run_optional "TPM update_plugins" "$tpm/bin/update_plugins" all
-  else
-    record_failure "TPM update_plugins (script is missing or not executable)"
-  fi
-else
-  log "Skipping TPM commands because its repository is unavailable"
-fi
-
 if (( ${#failures[@]} > 0 )); then
-  log "Bootstrap completed with ${#failures[@]} optional failure(s):"
+  log "Bootstrap completed with ${#failures[@]} dependency failure(s):"
   printf '  - %s\n' "${failures[@]}"
+  exit 1
 else
   log "Bootstrap completed successfully"
 fi

@@ -1,0 +1,10 @@
+/.zshrc
+/.gitignore
+/.gitmodules
+/README.md
+/.config/zsh/
+!/.config/zsh/zsh-file-manager/
+/.config/tmux/
+/.config/yadm/bootstrap
+/.config/yadm/sparse-shell
+/.config/yadm/alt/.config/zsh/

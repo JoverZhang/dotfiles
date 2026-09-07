@@ -553,15 +553,17 @@ set -g window-status-current-format '#[fg=#1e1e2e,bg=#1e1e2e]#[fg=#cdd6f4,bg=
 # 'status-right', you can use it in 'tmux_conf_theme_status_left' and
 # 'tmux_conf_theme_status_right' variables.
 
+# Update plugins explicitly via yadm bootstrap or <prefix> u.
+# Starting a terminal should not perform network updates.
 # by default, launching tmux will update tpm and all plugins
 #   - true (default)
 #   - false
-tmux_conf_update_plugins_on_launch=true
+tmux_conf_update_plugins_on_launch=false
 
 # by default, reloading the configuration will update tpm and all plugins
 #   - true (default)
 #   - false
-tmux_conf_update_plugins_on_reload=true
+tmux_conf_update_plugins_on_reload=false
 
 # by default, reloading the configuration will uninstall tpm and plugins when no
 # plugins are enabled

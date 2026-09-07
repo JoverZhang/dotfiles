@@ -118,6 +118,18 @@ if selected_component tmux; then
     "$target/.config/tmux/oh-my-tmux|https://github.com/gpakosz/.tmux.git"
     "$target/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm.git"
   )
+  # Read the customization file directly: the main Oh My Tmux config loads it
+  # dynamically, which TPM's standalone config scanner does not follow. Using
+  # Git here also avoids starting or modifying the user's default tmux server.
+  while IFS= read -r plugin; do
+    if [[ "$plugin" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_.-]*/[a-zA-Z0-9_][a-zA-Z0-9_.-]*$ ]]; then
+      repos+=("$target/.config/tmux/plugins/${plugin##*/}|https://github.com/$plugin.git")
+    else
+      record_failure "unsupported @plugin '$plugin' (expected GitHub owner/repository)"
+    fi
+  done < <(awk '$1 ~ /^set(-option)?$/ && $2 == "-g" && $3 == "@plugin" {
+    gsub(/[\047\042]/, "", $4); print $4
+  }' "$target/.config/tmux/tmux.conf.local")
 fi
 if selected_component gdb && [[ "$(uname -s)" == Linux ]]; then
   repos+=("$target/.config/gdb/gdb-dashboard|https://github.com/cyrus-and/gdb-dashboard.git")
@@ -127,27 +139,6 @@ for item in "${repos[@]}"; do
   IFS='|' read -r dir repo <<<"$item"
   clone_or_update "$dir" "$repo"
 done
-
-tpm="$target/.config/tmux/plugins/tpm"
-if selected_component tmux && [[ -d "$tpm/.git" ]]; then
-  # TPM otherwise guesses ~/.tmux/plugins when no server has set its path.
-  export TMUX_PLUGIN_MANAGER_PATH="$target/.config/tmux/plugins/"
-  if [[ -x "$tpm/bin/install_plugins" ]]; then
-    log "Running TPM install_plugins"
-    run_optional "TPM install_plugins" "$tpm/bin/install_plugins"
-  else
-    record_failure "TPM install_plugins (script is missing or not executable)"
-  fi
-
-  if [[ -x "$tpm/bin/update_plugins" ]]; then
-    log "Running TPM update_plugins all"
-    run_optional "TPM update_plugins" "$tpm/bin/update_plugins" all
-  else
-    record_failure "TPM update_plugins (script is missing or not executable)"
-  fi
-elif selected_component tmux; then
-  record_failure "TPM repository is unavailable"
-fi
 
 if (( ${#failures[@]} > 0 )); then
   log "Bootstrap completed with ${#failures[@]} dependency failure(s):"

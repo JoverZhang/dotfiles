@@ -59,6 +59,15 @@ export EDITOR='nvim'
 path=("${(@)path:#$HOME/DotFiles/bin}")
 export PATH="$HOME/.local/bin:$HOME/Tools/bin:/snap/bin/:$PATH:$HOME/.cargo/bin"
 
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+[[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+[[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+export SDKMAN_DIR="${SDKMAN_DIR:-$HOME/.sdkman}"
+[[ -s "$SDKMAN_DIR/bin/sdkman-init.sh" ]] && source "$SDKMAN_DIR/bin/sdkman-init.sh"
+export PNPM_HOME="${PNPM_HOME:-${XDG_DATA_HOME:-$HOME/.local/share}/pnpm}"
+[[ -d "$PNPM_HOME" ]] && path=("$PNPM_HOME" $path)
+[[ -d "$HOME/.tiup/bin" ]] && path=("$HOME/.tiup/bin" $path)
+
 # # Proxy Enable
 # export http_proxy=http://127.0.0.1:8889
 # export HTTP_PROXY=http://127.0.0.1:8889

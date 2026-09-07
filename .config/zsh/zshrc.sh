@@ -95,7 +95,7 @@ else
 fi
 
 # Widgets require a line editor; zsh -ic automation may have none.
-if [[ -o zle ]]; then
+if [[ -o zle && -t 0 && -t 1 ]]; then
   # Load fzf exactly once, then fzf-tab before plugins that wrap ZLE widgets.
   if (( $+commands[fzf] )); then
     autoload -Uz is-at-least
@@ -146,7 +146,7 @@ ranger-cd-widget() {
   ranger-cd
   zle reset-prompt
 }
-if [[ -o zle ]]; then
+if [[ -o zle && -t 0 && -t 1 ]]; then
   zle -N ranger-cd-widget
   bindkey '^F' ranger-cd-widget
 fi

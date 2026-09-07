@@ -2,6 +2,7 @@
 /.gitignore
 /.gitmodules
 /README.md
+/.local/bin/dotfiles-submodules
 /.config/zsh/
 !/.config/zsh/zsh-file-manager/
 /.config/tmux/

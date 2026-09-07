@@ -1,0 +1,4 @@
+# Loaded after fzf's widgets and before OMZ's history substring search.
+Aloxaf/fzf-tab
+zsh-users/zsh-autosuggestions
+zsh-users/zsh-syntax-highlighting

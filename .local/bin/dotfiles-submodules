@@ -17,6 +17,8 @@ The repository containing this script is used, regardless of the current directo
 Use --all with sync/update to explicitly select every declared submodule.
 Local changes are preserved: write operations refuse dirty checkouts or
 unrelated existing directories. Nothing is staged or committed automatically.
+Existing checkouts must have an origin matching their .gitmodules URL.
+Git URL rewrites and GitHub's HTTPS/SSH URL forms are supported.
 
 Examples:
   dotfiles-submodules status
@@ -92,6 +94,27 @@ is_checkout() {
   [[ -e "$1/.git" ]] && [[ $(git -C "$1" rev-parse --show-toplevel 2>/dev/null) == "$1" ]]
 }
 
+source_identity() {
+  local source=$1
+  case "$source" in
+    https://github.com/*) source=${source#https://github.com/} ;;
+    ssh://git@github.com/*) source=${source#ssh://git@github.com/} ;;
+    git@github.com:*) source=${source#git@github.com:} ;;
+    *) printf '%s\n' "$source"; return ;;
+  esac
+  source=${source%/}
+  printf 'github.com/%s\n' "${source%.git}" | LC_ALL=C tr '[:upper:]' '[:lower:]'
+}
+
+has_expected_source() {
+  local index=$1 declared expected actual
+  declared=$(git config --file "$root/.gitmodules" --get "submodule.${module_names[$index]}.url") || return 1
+  # --get-url expands insteadOf rules without contacting the remote.
+  expected=$(git -C "$root" ls-remote --get-url -- "$declared") || return 1
+  actual=$(git -C "$root/${module_paths[$index]}" remote get-url origin 2>/dev/null) || return 1
+  [[ $(source_identity "$actual") == "$(source_identity "$expected")" ]]
+}
+
 targets=()
 recorded=()
 for i in "${selected[@]}"; do
@@ -117,6 +140,7 @@ show_status() {
       [[ "$installed" == "${recorded[$i]}" ]] || state=changed
       changes=$(git -C "$directory" status --porcelain --untracked-files=all --ignore-submodules=none)
       [[ -z "$changes" ]] || state=dirty
+      has_expected_source "$i" || state='source mismatch'
     elif [[ -e "$directory" && ( ! -d "$directory" || -n $(ls -A -- "$directory") ) ]]; then
       state='unmanaged path'
     fi
@@ -134,7 +158,12 @@ for i in "${selected[@]}"; do
   directory="$root/${module_paths[$i]}"
   [[ ! -L "$directory" ]] || die "refusing a symlink: $directory"
   if is_checkout "$directory"; then
+    has_expected_source "$i" ||
+      die "${module_names[$i]} has a different or missing origin; inspect its remotes and .gitmodules before $action"
     changes=$(git -C "$directory" status --porcelain --untracked-files=all --ignore-submodules=none)
+    if [[ -n "$changes" && "${module_paths[$i]}" == .config/tmux/plugins/tpm ]]; then
+      die "tpm has local changes; see $root/.config/tmux/tpm-migration.md before $action"
+    fi
     [[ -z "$changes" ]] ||
       die "${module_names[$i]} has local changes; commit or move them before $action"
   elif [[ -e "$directory" && ( ! -d "$directory" || -n $(ls -A -- "$directory") ) ]]; then

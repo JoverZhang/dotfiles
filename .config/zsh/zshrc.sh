@@ -1,16 +1,32 @@
-unset DOT_FILES
-ZSH_ROOT=$(dirname $0)
+# Shared interactive shell configuration. Loaded by ~/.zshrc.
+[[ -o interactive ]] || return 0
+ZSH_ROOT=${${(%):-%N}:A:h}
+DOTFILES_ZSH_PERSONAL=true
+[[ -r "$ZSH_ROOT/profile.zsh" ]] && source "$ZSH_ROOT/profile.zsh"
 
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:/usr/local/bin:$PATH
-
-# Path to your oh-my-zsh installation.
 export ZSH="$ZSH_ROOT/ohmyzsh"
+export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/oh-my-zsh"
+export EDITOR="${EDITOR:-nvim}"
+# Keep prompt/completion caches outside the yadm work tree's tracked paths.
+export ZSH_COMPDUMP="$ZSH_CACHE_DIR/zcompdump-${ZSH_VERSION}"
+mkdir -p "$ZSH_CACHE_DIR"
+fpath=("$HOME/.zfunc" $fpath)
 
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time oh-my-zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
+HISTFILE=${HISTFILE:-$HOME/.zsh_history}
+HISTSIZE=250000
+SAVEHIST=200000
+HIST_STAMPS="yyyy-mm-dd"
+CASE_SENSITIVE=false
+HYPHEN_INSENSITIVE=true
+DISABLE_AUTO_TITLE=true
+
+# fzf's shell widgets and fzf-tab have separate display settings.
+export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS:---height 40% --layout=reverse --border --cycle --info=inline}"
+export FZF_CTRL_R_OPTS="${FZF_CTRL_R_OPTS:---height 50% --layout=reverse --border}"
+ZSH_AUTOSUGGEST_STRATEGY=(history completion)
+ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
+HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1
+
 if [ -z "$ZSH_THEME" ]; then
   # ZSH_THEME="kolo"
 
@@ -50,314 +66,97 @@ if [ -z "$ZSH_THEME" ]; then
   add-zsh-hook precmd theme_precmd
 fi
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
 plugins=(git docker kubectl)
+if [[ -r "$ZSH/oh-my-zsh.sh" ]]; then
+  source "$ZSH/oh-my-zsh.sh"
+else
+  autoload -Uz compinit
+  compinit -i -d "$ZSH_COMPDUMP"
+fi
 
-source $ZSH/oh-my-zsh.sh
-source $ZSH_ROOT/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source $ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh
-# source $ZSH_ROOT/zsh-file-manager/zsh-file-manager.zsh
-source $ZSH_ROOT/fzf/shell/completion.zsh
-source $ZSH_ROOT/fzf/shell/key-bindings.zsh
+# Retain repeated events in chronological order; deduplicate search results.
+setopt append_history extended_history share_history hist_ignore_space hist_verify
+setopt hist_find_no_dups hist_reduce_blanks
+unsetopt hist_ignore_all_dups hist_ignore_dups hist_expire_dups_first beep
 
-function ranger-cd {
-  tempfile="$(mktemp -t tmp.ranger-cd.XXXXXX)"
-  ranger --choosedir="$tempfile" "${@:-$(pwd)}"
-  test -f "$tempfile" &&
-    if [ "$(cat -- "$tempfile")" != "$(echo -n $(pwd))" ]; then
-      cd -- "$(cat "$tempfile")"
+# Configure completion after Oh My Zsh, which installs its own styles.
+zstyle ':completion:*' menu no
+zstyle ':completion:*:*:*:*:*' menu no
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:descriptions' format '[%d]'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':fzf-tab:*' fzf-command fzf
+zstyle ':fzf-tab:*' fzf-flags --height=40% --layout=reverse --border --cycle --info=inline
+zstyle ':fzf-tab:*' switch-group ',' '.'
+if [[ "$OSTYPE" == darwin* ]]; then
+  zstyle ':fzf-tab:complete:cd:*' fzf-preview 'CLICOLOR_FORCE=1 command ls -G -la -- "$realpath"'
+else
+  zstyle ':fzf-tab:complete:cd:*' fzf-preview 'command ls --color=always -la -- "$realpath"'
+fi
+
+# Widgets require a line editor; zsh -ic automation may have none.
+if [[ -o zle ]]; then
+  # Load fzf exactly once, then fzf-tab before plugins that wrap ZLE widgets.
+  if (( $+commands[fzf] )); then
+    autoload -Uz is-at-least
+    if is-at-least 0.48.0 "${${(s: :)$(fzf --version)}[1]}"; then
+      source <(fzf --zsh)
+    elif [[ -r "$ZSH_ROOT/fzf/shell/key-bindings.zsh" ]]; then
+      source "$ZSH_ROOT/fzf/shell/completion.zsh"
+      source "$ZSH_ROOT/fzf/shell/key-bindings.zsh"
     fi
-  rm -f -- "$tempfile"
-}
-bindkey -s '^F' 'ranger-cd\n'
+    [[ -r "$ZSH_ROOT/fzf-tab/fzf-tab.plugin.zsh" ]] && source "$ZSH_ROOT/fzf-tab/fzf-tab.plugin.zsh"
+  fi
+  [[ -r "$ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh" ]] && source "$ZSH_ROOT/zsh-autosuggestions/zsh-autosuggestions.zsh"
+  [[ -r "$ZSH_ROOT/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ]] && source "$ZSH_ROOT/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+  [[ -r "$ZSH/plugins/history-substring-search/history-substring-search.plugin.zsh" ]] && source "$ZSH/plugins/history-substring-search/history-substring-search.plugin.zsh"
 
-# User configuration
+  if (( ${+widgets[fzf-history-widget]} )); then
+    bindkey '^R' fzf-history-widget
+  fi
+  if (( ${+widgets[history-substring-search-up]} )); then
+    bindkey '^[[A' history-substring-search-up
+    bindkey '^[[B' history-substring-search-down
+    bindkey '^[OA' history-substring-search-up
+    bindkey '^[OB' history-substring-search-down
+    bindkey '^P' history-substring-search-up
+    bindkey '^N' history-substring-search-down
+  fi
+  # Alt-C remains available to fzf outside tmux; tmux reserves M-c for ccmux.
 
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-LANG=en_US.UTF-8
-LC_ADDRESS=en_US.UTF-8
-LC_IDENTIFICATION=en_US.UTF-8
-LC_MEASUREMENT=en_US.UTF-8
-LC_MONETARY=en_US.UTF-8
-LC_NAME=en_US.UTF-8
-LC_NUMERIC=en_US.UTF-8
-LC_PAPER=en_US.UTF-8
-LC_TELEPHONE=en_US.UTF-8
-LC_TIME=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch x86_64"
-
-# Set personal aliases, overriding those provided by oh-my-zsh libs,
-# plugins, and themes. Aliases can be placed here, though oh-my-zsh
-# users are encouraged to define aliases within the ZSH_CUSTOM folder.
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-
-##############################################################################
-
-# Aliases
-alias ce="claude -p 'concisely explain the root cause of this build error'"
-alias p="proxychains -f $HOME/.config/proxychains/proxychains.conf"
-alias t='asynctask -f'
-# alias docker='podman'
-# alias docker-compose='podman-compose'
-alias nvid='neovide --neovim-bin $HOME/Tools/bin/nvim'
-# alias redis-cli="$HOME/Workspace/sourcecode/github/redis/src/redis-cli"
-
-alias ll='lsd -l --color=auto'
-alias l='ll -a'
-
-alias rm='rm -i'
-alias mv='mv -i'
-
-# Environments
-export WS="$HOME/Workspace"
-export EDITOR='nvim'
-path=("${(@)path:#$HOME/DotFiles/bin}")
-export PATH="$HOME/.local/bin:$HOME/Tools/bin:/snap/bin/:$PATH:$HOME/.cargo/bin"
-
-# # Proxy Enable
-# export http_proxy=http://127.0.0.1:8889
-# export HTTP_PROXY=http://127.0.0.1:8889
-# export https_proxy=http://127.0.0.1:8889
-# export HTTPS_PROXY=http://127.0.0.1:8889
-# export ftp_proxy=http://127.0.0.1:8889
-# export FTP_PROXY=http://127.0.0.1:8889
-# export no_proxy=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
-# export NO_PROXY=localhost,127.0.0.1,10.96.0.0/12,192.168.0.0/16
-#
-# # Proxy Disable
-# unset http_proxy
-# unset HTTP_PROXY
-# unset https_proxy
-# unset HTTPS_PROXY
-# unset ftp_proxy
-# unset FTP_PROXY
-# unset no_proxy
-# unset NO_PROXY
-
-# Window
-export GDK_SCALE=2
-export GDK_DPI_SCALE=0.5
-
-# Gradle
-export GRADLE_USER_HOME=$HOME/.gradle
-
-# Flutter
-export CHROME_EXECUTABLE='/usr/bin/google-chrome-stable'
-
-# golang
-if command -v go &>/dev/null; then
-  export GOROOT=$(go env GOROOT)
-  export GOPATH=$(go env GOPATH)
-  export PATH=$PATH:$(go env GOPATH)/bin
-else
-  echo 'command "go" could not be found'
-fi
-# npm
-if ! (command -v npm &>/dev/null); then
-  echo 'command "npm" could not be found'
 fi
 
-# fzf keymaps
-# autoload -Uz fzf-cd-widget
-# zle -N fzf-cd-widget
-# bindkey '^F' fzf-cd-widget
-
-# fshow - git commit browser
-fshow() {
-  local out sha q
-  while out=$(
-    git log --graph --color=always \
-      --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" |
-      fzf --ansi --multi --no-sort --reverse --query="$q" --print-query
-  ); do
-    q=$(head -1 <<<"$out")
-    while read sha; do
-      [ -n "$sha" ] && git show --color=always $sha | less -R
-    done < <(sed '1d;s/^[^a-z0-9]*//;/^$/d' <<<"$out" | awk '{print $1}')
-  done
+ranger-cd() {
+  local tmpfile dir result=0
+  tmpfile=$(mktemp -t ranger-cwd.XXXXXX) || return
+  {
+    command ranger --choosedir="$tmpfile" "$@" < /dev/tty > /dev/tty 2>&1 || return
+    dir=$(<"$tmpfile")
+    if [[ -n "$dir" && "$dir" != "$PWD" ]]; then
+      builtin cd -- "$dir" || result=$?
+    fi
+  } always {
+    command rm -f -- "$tmpfile"
+  }
+  return $result
 }
-
-function runbuild() {
-  TARGET=$(fzf --prompt="Select file to compile: ")
-  if [[ -z "$TARGET" ]]; then
-    echo "No file selected."
-    return 1
-  fi
-
-  # Select the compiler based on the file suffix
-  case "$TARGET" in
-  *.c) COMPILER="gcc" ;;
-  *.cpp) COMPILER="g++" ;;
-  *.go) COMPILER="go build -o" ;;
-  *.rs) COMPILER="rustc" ;;
-  *.py) COMPILER="python3" ;;
-  *.java) COMPILER="javac" ;;
-  *) echo "Unsupported file type." && return 1 ;;
-  esac
-
-  CMD="$COMPILER \"$TARGET\" -o \"${TARGET%.*}.out\" && \"./${TARGET%.*}.out\" && rm \"./${TARGET%.*}.out\" #auto_run"
-
-  print -s "$CMD"
-  eval "$CMD"
-}
-
-# c-f
-fzf-ls-cd-widget() {
-  local cmd="ls -al --color=yes | sed 1,2d"
-  # local cmd="exa -bglHh --all --all --color=always | sed 2,2d"
-  setopt localoptions pipefail no_aliases 2>/dev/null
-  local dir="$(eval "$cmd" | FZF_DEFAULT_OPTS="--ansi --bind change:top --nth=9 --height ${FZF_TMUX_HEIGHT:-60%} --reverse --preview='if [ -f {9} ]; then bat -pn --color=always {9}; else ls -alH --color=yes {9}; fi' | awk '{ print \$9 }' --bind=ctrl-z:ignore ${FZF_DEFAULT_OPTS-} ${FZF_ALT_C_OPTS-}" $(__fzfcmd) +m | awk '{ print $9 }')"
-
-  # skip
-  if [[ -z "$dir" ]]; then
-    zle redisplay
-    return 0
-  fi
-
-  # push to buffer
-  if [[ -f "$dir" ]]; then
-    zle redisplay
-    BUFFER="$dir"
-    return 0
-  fi
-
-  # cd to directory
-  zle push-line
-  BUFFER="builtin cd -- ${dir}"
-  zle accept-line
-  local ret=$?
-  unset dir
+alias ra='ranger-cd'
+ranger-cd-widget() {
+  zle -I
+  ranger-cd
   zle reset-prompt
-  return $ret
 }
-# autoload -Uz fzf-ls-cd-widget
-# zle -N fzf-ls-cd-widget
-# bindkey '^F' fzf-ls-cd-widget
-
-eval "$(ccmux completion zsh)"
-
-##############################################################################
-
-# fpath
-fpath+=~/.zfunc
-
-[ -f "~/.fzf.zsh" ] && source ~/.fzf.zsh
-
-# commmon commands
-declare -a COMMANDS=(
-  # exa
-  bat
-  lsd
-  dust # du
-  duf  # df
-  fd   # find
-  rg
-  ranger
-  ag
-  fzf
-  choose
-  jq
-  sd   # sed
-  tldr # man
-  btm
-  # hyperfine # time
-  # gping
-  curlie
-  dog # dig
-)
-for cmd in "${COMMANDS[@]}"; do
-  if ! command -v "$cmd" &>/dev/null; then
-    echo "command \"$cmd\" could not be found"
-  fi
-done
-
-# init zoxide
-if command -v zoxide &>/dev/null; then
-  eval "$(zoxide init zsh)"
-else
-  echo 'command "zoxide" could not be found'
+if [[ -o zle ]]; then
+  zle -N ranger-cd-widget
+  bindkey '^F' ranger-cd-widget
 fi
 
-# auto start tmux
-# if command -v tmux &>/dev/null; then
-# 	if [ -z "$TMUX" -a -z "$DONT_TMUX" ]; then
-# 		tmux
-# 	fi
-# else
-# 	echo 'command "tmux" could not be found'
-# fi
+if [[ "$DOTFILES_ZSH_PERSONAL" == true ]]; then
+  source "$ZSH_ROOT/personal.zsh"
+fi
+# Account-specific environment and aliases, selected by yadm alternates.
+[[ -r "$ZSH_ROOT/local.zsh" ]] && source "$ZSH_ROOT/local.zsh"
+
+(( $+commands[ccmux] )) && eval "$(ccmux completion zsh)"
+(( $+commands[zoxide] )) && eval "$(zoxide init zsh)"
+return 0

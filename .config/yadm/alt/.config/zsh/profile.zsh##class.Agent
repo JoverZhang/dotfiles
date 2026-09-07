@@ -1,0 +1,4 @@
+# Agent accounts share terminal ergonomics without workstation-only commands.
+DOTFILES_ZSH_PERSONAL=false
+ZSH_THEME=robbyrussell
+zstyle ':omz:update' mode disabled

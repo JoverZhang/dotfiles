@@ -30,7 +30,8 @@ yadm config yadm.auto-alt true
 yadm bootstrap
 ```
 
-This initializes all tracked submodules, plus gdb-dashboard on Linux.
+This initializes all tracked submodules, installs Oh My Zsh if missing,
+and installs gdb-dashboard on Linux.
 
 ## zsh and tmux Only
 
@@ -74,15 +75,17 @@ Use `dotfiles-submodules` to manage framework versions:
 
 ```bash
 dotfiles-submodules status
-dotfiles-submodules update omz tpm   # fetch newer upstream versions
+dotfiles-submodules update oh-my-tmux tpm   # fetch newer upstream versions
 ```
 
 `dotfiles-submodules pin NAME TAG_OR_COMMIT` selects a specific version.
-`dotfiles-submodules sync omz tpm` restores the recorded versions.
-Names include `omz`, `oh-my-tmux`, `tpm`, and `antidote`. Changes are left
+`dotfiles-submodules sync oh-my-tmux tpm` restores the recorded versions.
+Names include `oh-my-tmux`, `tpm`, and `antidote`. Changes are left
 unstaged: review with `yadm diff --submodule=log`, then use `yadm add` and
 `yadm commit` to record the selected versions. Run `dotfiles-submodules --help`
 for usage from a normal Git checkout.
 
+Oh My Zsh manages its own updates, prompting periodically by default; run
+`omz update` to update it manually. Bootstrap leaves an existing OMZ checkout alone.
 Update zsh plugins with `antidote update --bundles`; update tmux plugins with
 `Ctrl-A`, then `u`. Plugin versions are maintained by their plugin managers.

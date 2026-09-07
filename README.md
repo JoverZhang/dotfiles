@@ -103,6 +103,7 @@ already in HOME are never treated as files to remove.
 ```bash
 yadm config yadm.auto-alt false
 yadm init
+yadm gitconfig sparse.expectFilesOutsideOfPatterns true
 yadm remote add origin git@github.com:JoverZhang/dotfiles.git
 yadm fetch origin master
 yadm config local.class Agent
@@ -137,6 +138,12 @@ Dependency failures produce a nonzero exit status.
 To return to a full restore, first inspect and back up conflicts outside the
 current sparse selection. Then disable sparse checkout, clear `local.components`,
 select the intended platform class, and follow the full restore instructions.
+
+The `sparse.expectFilesOutsideOfPatterns` setting keeps unrelated existing HOME
+files outside yadm's active index selection, even when the full repository has
+files at the same paths. Keep it enabled while using a partial restore.
+The restore boundary can be checked from a normal Git checkout with
+`python3 .config/yadm/tests/partial-restore.py` (requires Git and yadm).
 
 ## Shared Shell Behavior
 

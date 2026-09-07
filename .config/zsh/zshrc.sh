@@ -21,8 +21,8 @@ HYPHEN_INSENSITIVE=true
 DISABLE_AUTO_TITLE=true
 
 # fzf's shell widgets and fzf-tab have separate display settings.
-export FZF_DEFAULT_OPTS="${FZF_DEFAULT_OPTS:---height 40% --layout=reverse --border --cycle --info=inline}"
-export FZF_CTRL_R_OPTS="${FZF_CTRL_R_OPTS:---height 50% --layout=reverse --border}"
+export FZF_DEFAULT_OPTS="--height 40% --layout=reverse --border --cycle --info=inline"
+export FZF_CTRL_R_OPTS="--height 50% --layout=reverse --border"
 ZSH_AUTOSUGGEST_STRATEGY=(history completion)
 ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets)
 HISTORY_SUBSTRING_SEARCH_ENSURE_UNIQUE=1

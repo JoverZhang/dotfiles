@@ -1,78 +1,21 @@
 #!/usr/bin/env bash
 
-# Initialize tracked submodules and install or update external shell tooling.
-# Dependency failures are reported at the end; submodule failures stop.
+# Install OMZ once and restore recorded submodules. Antidote and TPM own plugins.
+set -eo pipefail
 
-set -uo pipefail
+die() { printf 'bootstrap: %s\n' "$*" >&2; exit 1; }
+target=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/../.." && pwd -P)
 
-log() {
-  printf '%s\n' "$*"
-}
-
-declare -a failures=()
-
-record_failure() {
-  local label="$1"
-  failures+=("$label")
-  log "WARNING: $label failed"
-}
-
-run_optional() {
-  local label="$1"
-  shift
-
-  if "$@"; then
-    return 0
-  fi
-
-  record_failure "$label"
-  return 0
-}
-
-clone_or_update() {
-  local dir="$1"
-  local repo="$2"
-  local name
-  name="$(basename "$dir")"
-
-  if [[ -d "$dir" ]]; then
-    if [[ ! -e "$dir/.git" ]] || ! git -C "$dir" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      record_failure "$name (existing path is not a Git worktree)"
-      return 0
-    fi
-
-    log "Updating $name"
-    run_optional "$name update" git -C "$dir" pull --ff-only
-    return 0
-  fi
-
-  if [[ -e "$dir" ]]; then
-    record_failure "$name (existing path is not a directory)"
-    return 0
-  fi
-
-  if ! mkdir -p "$(dirname "$dir")"; then
-    record_failure "$name parent directory creation"
-    return 0
-  fi
-
-  log "Cloning $name"
-  run_optional "$name clone" git clone --depth=1 --single-branch "$repo" "$dir"
-}
-
-if ! command -v yadm >/dev/null 2>&1; then
-  log "ERROR: yadm is required to locate the work tree"
-  exit 1
+components=${DOTFILES_COMPONENTS:-}
+if [[ -z "$components" ]] && command -v yadm >/dev/null 2>&1 &&
+   [[ $(yadm rev-parse --show-toplevel 2>/dev/null) == "$target" ]]; then
+  components=$(yadm config local.components 2>/dev/null || true)
 fi
-
-# yadm bootstrap does not forward CLI arguments; selection is local config.
-# DOTFILES_COMPONENTS can override it for a single explicit bootstrap run.
-components=${DOTFILES_COMPONENTS:-$(yadm config local.components 2>/dev/null || true)}
 read -r -a selected <<< "${components:-all}"
 for component in "${selected[@]}"; do
   case "$component" in
     all|submodules|zsh|tmux|gdb) ;;
-    *) log "ERROR: unknown component: $component"; exit 1 ;;
+    *) die "unknown component: $component" ;;
   esac
 done
 selected_component() {
@@ -82,69 +25,51 @@ selected_component() {
   done
   return 1
 }
+printf 'Selected components: %s\n' "${selected[*]}"
 
-# Honor yadm's work tree, including an isolated restore made with clone -w.
-target=$(yadm rev-parse --show-toplevel) || exit 1
-cd "$target" || exit 1
-log "Selected components: ${selected[*]}"
-
-if selected_component submodules; then
-  log "Synchronizing tracked submodules"
-  yadm submodule sync --recursive || exit 1
-  log "Initializing tracked submodules"
-  yadm submodule update --init --recursive || exit 1
-fi
-
-declare -a repos=()
+modules=()
 if selected_component zsh; then
-  repos+=(
-    "$target/.config/zsh/ohmyzsh|https://github.com/ohmyzsh/ohmyzsh.git"
-    "$target/.config/zsh/zsh-autosuggestions|https://github.com/zsh-users/zsh-autosuggestions.git"
-    "$target/.config/zsh/zsh-syntax-highlighting|https://github.com/zsh-users/zsh-syntax-highlighting.git"
-    "$target/.config/zsh/fzf-tab|https://github.com/Aloxaf/fzf-tab.git"
-  )
-  # fzf provides shell integration directly; no separate source checkout.
-  if command -v fzf >/dev/null 2>&1; then
-    if ! fzf --zsh >/dev/null 2>&1; then
-      record_failure "fzf shell integration is unavailable; upgrade fzf to 0.48.0 or newer"
-    fi
-  else
-    record_failure "fzf is missing; install it with your system package manager"
-  fi
+  command -v zsh >/dev/null 2>&1 || die 'install zsh with your package manager'
+  command -v fzf >/dev/null 2>&1 && fzf --zsh >/dev/null 2>&1 ||
+    die 'install fzf 0.48.0 or newer with your package manager'
+  modules+=(antidote)
 fi
 if selected_component tmux; then
-  repos+=(
-    "$target/.config/tmux/oh-my-tmux|https://github.com/gpakosz/.tmux.git"
-    "$target/.config/tmux/plugins/tpm|https://github.com/tmux-plugins/tpm.git"
-  )
-  # Read the customization file directly: the main Oh My Tmux config loads it
-  # dynamically, which TPM's standalone config scanner does not follow. Using
-  # Git here also avoids starting or modifying the user's default tmux server.
-  while IFS= read -r plugin; do
-    if [[ "$plugin" =~ ^[a-zA-Z0-9_][a-zA-Z0-9_.-]*/[a-zA-Z0-9_][a-zA-Z0-9_.-]*$ ]]; then
-      repos+=("$target/.config/tmux/plugins/${plugin##*/}|https://github.com/$plugin.git")
-    else
-      record_failure "unsupported @plugin '$plugin' (expected GitHub owner/repository)"
-    fi
-  done < <(awk '$1 ~ /^set(-option)?$/ && $2 == "-g" && $3 == "@plugin" {
-    gsub(/[\047\042]/, "", $4); print $4
-  }' "$target/.config/tmux/tmux.conf.local")
+  command -v tmux >/dev/null 2>&1 || die 'install tmux with your package manager'
+  modules+=(oh-my-tmux tpm)
 fi
-if selected_component gdb && [[ "$(uname -s)" == Linux ]]; then
-  repos+=("$target/.config/gdb/gdb-dashboard|https://github.com/cyrus-and/gdb-dashboard.git")
+if selected_component submodules; then
+  "$target/.local/bin/dotfiles-submodules" sync --all
+elif (( ${#modules[@]} > 0 )); then
+  "$target/.local/bin/dotfiles-submodules" sync "${modules[@]}"
 fi
 
-for item in "${repos[@]}"; do
-  IFS='|' read -r dir repo <<<"$item"
-  clone_or_update "$dir" "$repo"
-done
-
-if (( ${#failures[@]} > 0 )); then
-  log "Bootstrap completed with ${#failures[@]} dependency failure(s):"
-  printf '  - %s\n' "${failures[@]}"
-  exit 1
-else
-  log "Bootstrap completed successfully"
+# OMZ manages its own updates; bootstrap only installs it when missing.
+if selected_component zsh; then
+  omz="$target/.config/zsh/ohmyzsh"
+  if [[ ! -e "$omz" && ! -L "$omz" ]]; then
+    mkdir -p "$target/.config/zsh"
+    git clone --depth=1 https://github.com/ohmyzsh/ohmyzsh.git "$omz"
+  elif [[ ! -e "$omz/.git" ]] ||
+       [[ $(git -C "$omz" rev-parse --show-toplevel 2>/dev/null) != "$omz" ]]; then
+    die "existing path is not an OMZ Git checkout: $omz"
+  fi
 fi
 
-exit 0
+# Preserve the existing optional Linux GDB-dashboard installation.
+if selected_component gdb && [[ $(uname -s) == Linux ]]; then
+  dashboard="$target/.config/gdb/gdb-dashboard"
+  if [[ -e "$dashboard/.git" ]]; then
+    git -C "$dashboard" pull --ff-only
+  elif [[ -e "$dashboard" || -L "$dashboard" ]]; then
+    die "existing path is not a Git checkout: $dashboard"
+  else
+    mkdir -p "$target/.config/gdb"
+    git clone --depth=1 https://github.com/cyrus-and/gdb-dashboard.git "$dashboard"
+  fi
+fi
+
+printf 'Bootstrap completed.\n'
+if selected_component tmux; then
+  printf 'In tmux, press <prefix> I to install missing plugins with TPM.\n'
+fi

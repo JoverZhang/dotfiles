@@ -1,0 +1,202 @@
+#!/usr/bin/env bash
+
+# Manage the gitlinks in this dotfiles checkout, including a yadm work tree.
+set -eo pipefail
+
+usage() {
+  cat <<'USAGE'
+Usage: dotfiles-submodules COMMAND [NAME ...]
+
+  status [NAME ...]       Show recorded and installed versions (default: all).
+  sync NAME ...          Install/restore the versions recorded in the index.
+  update NAME ...        Fetch and check out each module's upstream branch.
+  pin NAME TAG_OR_COMMIT  Check out a specific version, fetching it if needed.
+
+Names come from .gitmodules; a module's path or directory name also works.
+The repository containing this script is used, regardless of the current directory.
+Use --all with sync/update to explicitly select every declared submodule.
+Local changes are preserved: write operations refuse dirty checkouts or
+unrelated existing directories. Nothing is staged or committed automatically.
+Existing checkouts must have an origin matching their .gitmodules URL.
+Git URL rewrites and GitHub's HTTPS/SSH URL forms are supported.
+
+Examples:
+  dotfiles-submodules status
+  dotfiles-submodules update oh-my-tmux tpm
+  dotfiles-submodules sync oh-my-tmux tpm
+  dotfiles-submodules pin tpm TAG_OR_COMMIT
+USAGE
+}
+
+die() { printf 'dotfiles-submodules: %s\n' "$*" >&2; exit 1; }
+
+action=${1:-status}
+(( $# == 0 )) || shift
+case "$action" in
+  -h|--help|help) usage; exit 0 ;;
+  status|sync|update) ;;
+  pin) (( $# == 2 )) || die 'pin requires one module and a tag or commit'
+       requested_ref=$2
+       [[ "$requested_ref" != -* && "$requested_ref" != *:* ]] || die 'invalid version'
+       set -- "$1" ;;
+  *) usage >&2; die "unknown command: $action" ;;
+esac
+[[ "$action" == status || $# -gt 0 ]] || die 'select a module, or use --all'
+
+script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+root=$(cd -- "$script_dir/../.." && pwd -P)
+[[ -f "$root/.gitmodules" ]] || die "no .gitmodules in $root"
+if [[ -e "$root/.git" ]] && [[ $(git -C "$root" rev-parse --show-toplevel 2>/dev/null) == "$root" ]]; then
+  repo=(git -C "$root")
+  repo_command=git
+elif command -v yadm >/dev/null 2>&1 && [[ $(yadm rev-parse --show-toplevel 2>/dev/null) == "$root" ]]; then
+  repo=(yadm)
+  repo_command=yadm
+else
+  die "$root is not a Git or yadm work tree"
+fi
+# Git's submodule helper needs a working-directory context even through yadm.
+cd "$root"
+
+module_names=()
+module_paths=()
+while IFS= read -r -d '' entry; do
+  config_key=${entry%%$'\n'*}
+  module_name=${config_key#submodule.}
+  module_names+=("${module_name%.path}")
+  module_paths+=("${entry#*$'\n'}")
+done < <(git config --null --file "$root/.gitmodules" --get-regexp '^submodule\..*\.path$')
+(( ${#module_names[@]} > 0 )) || die 'no submodules declared'
+
+selected=()
+if (( $# == 0 )) || [[ "$1" == --all ]]; then
+  (( $# <= 1 )) || die '--all cannot be combined with module names'
+  [[ "$action" != pin ]] || die 'pin requires one module'
+  selected=("${!module_names[@]}")
+else
+  for selector in "$@"; do
+    matches=()
+    for i in "${!module_names[@]}"; do
+      if [[ "$selector" == "${module_names[$i]}" || "$selector" == "${module_paths[$i]}" || "$selector" == "${module_paths[$i]##*/}" ]]; then
+        matches+=("$i")
+      fi
+    done
+    (( ${#matches[@]} == 1 )) || die "unknown or ambiguous module: $selector"
+    duplicate=false
+    for i in "${selected[@]}"; do
+      [[ "$i" != "${matches[0]}" ]] || duplicate=true
+    done
+    $duplicate || selected+=("${matches[0]}")
+  done
+fi
+
+is_checkout() {
+  [[ -e "$1/.git" ]] && [[ $(git -C "$1" rev-parse --show-toplevel 2>/dev/null) == "$1" ]]
+}
+
+source_identity() {
+  local source=$1
+  case "$source" in
+    https://github.com/*) source=${source#https://github.com/} ;;
+    ssh://git@github.com/*) source=${source#ssh://git@github.com/} ;;
+    git@github.com:*) source=${source#git@github.com:} ;;
+    *) printf '%s\n' "$source"; return ;;
+  esac
+  source=${source%/}
+  printf 'github.com/%s\n' "${source%.git}" | LC_ALL=C tr '[:upper:]' '[:lower:]'
+}
+
+has_expected_source() {
+  local index=$1 declared expected actual
+  declared=$(git config --file "$root/.gitmodules" --get "submodule.${module_names[$index]}.url") || return 1
+  # --get-url expands insteadOf rules without contacting the remote.
+  expected=$(git -C "$root" ls-remote --get-url -- "$declared") || return 1
+  actual=$(git -C "$root/${module_paths[$index]}" remote get-url origin 2>/dev/null) || return 1
+  [[ $(source_identity "$actual") == "$(source_identity "$expected")" ]]
+}
+
+targets=()
+recorded=()
+for i in "${selected[@]}"; do
+  module_path=${module_paths[$i]}
+  entry=
+  IFS= read -r -d '' entry < <("${repo[@]}" ls-files --stage -z -- "$module_path") || true
+  read -r mode revision stage <<< "${entry%%$'\t'*}"
+  [[ "$mode" == 160000 && "$stage" == 0 ]] || die "missing or conflicted gitlink: $module_path"
+  recorded[$i]=$revision
+  targets+=("$module_path")
+done
+
+show_status() {
+  printf 'Dotfiles: %s (%s)\n' "$root" "$repo_command"
+  printf '%-23s %-12s %-12s %s\n' NAME RECORDED INSTALLED STATE
+  for i in "${selected[@]}"; do
+    directory="$root/${module_paths[$i]}"
+    installed=-
+    state='not initialized'
+    if is_checkout "$directory"; then
+      installed=$(git -C "$directory" rev-parse HEAD)
+      state=recorded
+      [[ "$installed" == "${recorded[$i]}" ]] || state=changed
+      changes=$(git -C "$directory" status --porcelain --untracked-files=all --ignore-submodules=none)
+      [[ -z "$changes" ]] || state=dirty
+      has_expected_source "$i" || state='source mismatch'
+    elif [[ -e "$directory" && ( ! -d "$directory" || -n $(ls -A -- "$directory") ) ]]; then
+      state='unmanaged path'
+    fi
+    printf '%-23s %-12s %-12s %s\n' "${module_names[$i]##*/}" "${recorded[$i]:0:10}" "${installed:0:10}" "$state"
+  done
+}
+
+if [[ "$action" == status ]]; then
+  show_status
+  exit 0
+fi
+
+# Check every target before changing any of them.
+for i in "${selected[@]}"; do
+  directory="$root/${module_paths[$i]}"
+  [[ ! -L "$directory" ]] || die "refusing a symlink: $directory"
+  if is_checkout "$directory"; then
+    has_expected_source "$i" ||
+      die "${module_names[$i]} has a different or missing origin; inspect its remotes and .gitmodules before $action"
+    changes=$(git -C "$directory" status --porcelain --untracked-files=all --ignore-submodules=none)
+    if [[ -n "$changes" && "${module_paths[$i]}" == .config/tmux/plugins/tpm ]]; then
+      die "tpm has local changes; see $root/.config/tmux/tpm-migration.md before $action"
+    fi
+    [[ -z "$changes" ]] ||
+      die "${module_names[$i]} has local changes; commit or move them before $action"
+  elif [[ -e "$directory" && ( ! -d "$directory" || -n $(ls -A -- "$directory") ) ]]; then
+    die "existing path is not a submodule checkout: $directory"
+  fi
+done
+
+"${repo[@]}" submodule sync --recursive -- "${targets[@]}"
+case "$action" in
+  sync)
+    "${repo[@]}" submodule update --init --checkout --recursive -- "${targets[@]}"
+    ;;
+  update)
+    "${repo[@]}" submodule update --init --checkout --remote -- "${targets[@]}"
+    # Nested dependencies follow their parent's recorded versions.
+    for module_path in "${targets[@]}"; do
+      git -C "$root/$module_path" submodule update --init --checkout --recursive
+    done
+    ;;
+  pin)
+    directory="$root/${targets[0]}"
+    if ! is_checkout "$directory"; then
+      "${repo[@]}" submodule update --init --checkout -- "${targets[0]}"
+    fi
+    if ! revision=$(git -C "$directory" rev-parse --verify --end-of-options "${requested_ref}^{commit}" 2>/dev/null); then
+      git -C "$directory" fetch --no-tags -- origin "$requested_ref"
+      revision=$(git -C "$directory" rev-parse --verify 'FETCH_HEAD^{commit}')
+    fi
+    git -C "$directory" checkout --detach "$revision"
+    git -C "$directory" submodule update --init --checkout --recursive
+    ;;
+esac
+show_status
+if [[ "$action" != sync ]]; then
+  printf '\nReview with `%s diff --submodule=log`, then add and commit the selected paths to record their versions.\n' "$repo_command"
+fi

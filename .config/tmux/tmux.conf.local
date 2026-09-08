@@ -209,7 +209,7 @@ tmux_conf_theme_window_status_activity_attr="underscore"
 # window bell status style
 tmux_conf_theme_window_status_bell_fg="$tmux_conf_theme_colour_5"
 tmux_conf_theme_window_status_bell_bg="default"
-tmux_conf_theme_window_status_bell_attr="blink,bold"
+tmux_conf_theme_window_status_bell_attr="none"
 
 # window last status style
 tmux_conf_theme_window_status_last_fg="$tmux_conf_theme_colour_4"
@@ -525,23 +525,57 @@ bind -T copy-mode-vi TripleClick1Pane \
 
 bind-key -n M-c display-popup -E -w 80% -h 75% "ccmux"
 
+bind-key -n M-t display-menu -T 'Tmux Toolbox' -x C -y C \
+  'New window' c 'new-window -c "#{pane_current_path}"' \
+  'Choose window / session' w 'choose-tree -Zw' \
+  'New session' n 'command-prompt -p "Session name:" "new-session -s %%"' \
+  'Rename window' r 'command-prompt -I "#W" "rename-window %%"' \
+  'Rename session' R 'command-prompt -I "#S" "rename-session %%"' \
+  '' \
+  'Split left / right' v 'split-window -h -c "#{pane_current_path}"' \
+  'Split top / bottom' s 'split-window -v -c "#{pane_current_path}"' \
+  'Next layout' Space 'next-layout' \
+  'Swap with next pane' o 'swap-pane -D' \
+  'Move pane to new window' b 'break-pane' \
+  'Toggle synchronized input' S 'set-window-option synchronize-panes' \
+  'Toggle zoom' z 'resize-pane -Z' \
+  'Copy mode' y 'copy-mode' \
+  '' \
+  'Close pane' x 'confirm-before -p "Close pane #P? (y/n)" kill-pane'
+
+# Detach the popup client to keep its shell and programs running between visits.
+bind-key -n M-n if-shell -F '#{==:#{session_name},notes}' \
+  'detach-client' \
+  'display-popup -E -w 90% -h 90% -d "#{pane_current_path}" "tmux new-session -A -s notes"'
+bind-key C-f run-shell 'tmux display-popup -E -w 90% -h 85% -e TMUX_PICKER_CLIENT=#{q:client_name} "bash ~/.config/tmux/window-picker.sh"'
+
+
 
 # Keep the status line at the bottom and reproduce Catppuccin's rounded tabs
 # and icon/text status modules without loading the plugin. These are reapplied
 # after oh-my-tmux generates its theme.
-set -g @mocha_status_session '#[fg=#{?client_prefix,#f38ba8,#a6e3a1},bg=#1e1e2e]#[fg=#11111b,bg=#{?client_prefix,#f38ba8,#a6e3a1},bold] #[fg=#cdd6f4,bg=#313244,nobold] #S #[fg=#313244,bg=#1e1e2e] '
+set -g @mocha_status_session '#[fg=#{?client_prefix,#f38ba8,#a6e3a1},bg=#1e1e2e]#[fg=#11111b,bg=#{?client_prefix,#f38ba8,#a6e3a1},bold] #[fg=#a6adc8,bg=#313244,nobold] #{user} / #[fg=#cdd6f4]#S #[fg=#313244,bg=#1e1e2e] '
 set -g @mocha_status_host '#[fg=#cba6f7,bg=#1e1e2e]#[fg=#11111b,bg=#cba6f7]󰒋 #[fg=#cdd6f4,bg=#313244] #H#[fg=#313244,bg=#1e1e2e] '
-set -g @mocha_status_directory '#[fg=#f5e0dc,bg=#1e1e2e]#[fg=#11111b,bg=#f5e0dc] #[fg=#cdd6f4,bg=#313244] #{b:pane_current_path} #[fg=#313244,bg=#1e1e2e] '
+# Reserve the window list and other modules before allocating directory space.
+set -g @mocha_directory_budget '#{e|-:#{client_width},#{e|+:#{n:#{W: #W #I        }},#{e|+:#{n:#S#{user}#H},#{?@battery_percentage,44,34}}}}'
+set -g @mocha_status_directory '#[fg=#f5e0dc,bg=#1e1e2e]#[fg=#11111b,bg=#f5e0dc] #[fg=#cdd6f4,bg=#313244] #{=/#{e|-:#{E:@mocha_directory_budget},6}/…:#{b:pane_current_path}} #[fg=#313244,bg=#1e1e2e] '
 set -g @mocha_status_battery '#[fg=#b4befe,bg=#1e1e2e]#[fg=#11111b,bg=#b4befe]#{?#{==:#{@battery_status},󰂄},󰂄,#{?#{>=:#{@battery_percentage},90},󰁹,#{?#{>=:#{@battery_percentage},80},󰂁,#{?#{>=:#{@battery_percentage},70},󰁿,#{?#{>=:#{@battery_percentage},60},󰁾,#{?#{>=:#{@battery_percentage},50},󰁽,#{?#{>=:#{@battery_percentage},40},󰁼,#{?#{>=:#{@battery_percentage},30},󰁻,󰁺}}}}}}}} #[fg=#cdd6f4,bg=#313244] #{@battery_percentage}#[fg=#313244,bg=#1e1e2e] '
 set -g @mocha_status_date_time '#[fg=#74c7ec,bg=#1e1e2e]#[fg=#11111b,bg=#74c7ec]󰃰 #[fg=#cdd6f4,bg=#313244] %H:%M#[fg=#313244,bg=#1e1e2e] '
 set -g status-position bottom #!important
 set -g status-left-length 100 #!important
-set -g status-right-length 160 #!important
-set -g status-left '#{E:@mocha_status_session}#{E:@mocha_status_directory}' #!important
-set -g status-right '#(nice cut -c3- ~/.config/tmux/tmux.conf | sh -s _battery_status 󰂄 󰂃)#{E:@mocha_status_host}#{E:@mocha_status_date_time}#{?@battery_percentage,#{E:@mocha_status_battery},}' #!important
+set -g status-right-length 1000 #!important
+set -g status-left '#{E:@mocha_status_session}  ' #!important
+set -g status-right '#(nice cut -c3- ~/.config/tmux/tmux.conf | sh -s _battery_status 󰂄 󰂃)#{?#{>:#{E:@mocha_directory_budget},8},#{E:@mocha_status_directory},}#{E:@mocha_status_host}#{E:@mocha_status_date_time}#{?@battery_percentage,#{E:@mocha_status_battery},}' #!important
 set -g window-status-separator ' ' #!important
-set -g window-status-format '#[fg=#313244,bg=#1e1e2e]#[fg=#cdd6f4,bg=#313244] #W#{?window_bell_flag, 󰂞,}#{?window_zoomed_flag, 󰁌,}#[fg=#89b4fa,bg=#313244] █#[fg=#313244,bg=#89b4fa]#I#[fg=#89b4fa,bg=#1e1e2e]' #!important
-set -g window-status-current-format '#[fg=#1e1e2e,bg=#1e1e2e]#[fg=#cdd6f4,bg=#1e1e2e] #W#{?window_bell_flag, 󰂞,}#{?window_zoomed_flag, 󰁌,}#[fg=#fab387,bg=#1e1e2e] █#[fg=#1e1e2e,bg=#fab387]#I#[fg=#fab387,bg=#1e1e2e]' #!important
+# Ordinary output gets a yellow underline; only bell notifications flash.
+set -g window-status-activity-style 'fg=default,bg=default,underscore,us=#f9e2af' #!important
+# Refresh the bell background once a second; terminal blink affects text only.
+set -g status-interval 1 #!important
+set -g @mocha_bell_lit '#{&&:#{window_bell_flag},#{e|%:#(date +%%s),2}}'
+set -g @mocha_tab_bg '#{?#{E:@mocha_bell_lit},#f9e2af,#313244}'
+set -g @mocha_tab_fg '#{?#{E:@mocha_bell_lit},#1e1e2e,#cdd6f4}'
+set -g window-status-format '#[fg=#{E:@mocha_tab_bg},bg=#1e1e2e]#[fg=#{E:@mocha_tab_fg},bg=#{E:@mocha_tab_bg}] #W#{?window_bell_flag, 󰂞,}#{?window_zoomed_flag,#[fg=#{?#{E:@mocha_bell_lit},#d20f39,#f9e2af}] 󰁌#[fg=#{E:@mocha_tab_fg}],}#[fg=#89b4fa,bg=#{E:@mocha_tab_bg}] █#[fg=#313244,bg=#89b4fa]#I#[fg=#89b4fa,bg=#1e1e2e]' #!important
+set -g window-status-current-format '#[fg=#1e1e2e,bg=#1e1e2e]#[fg=#cdd6f4,bg=#1e1e2e] #W#{?window_bell_flag, 󰂞,}#{?window_zoomed_flag,#[fg=#f9e2af] 󰁌#[fg=#cdd6f4],}#[fg=#fab387,bg=#1e1e2e] █#[fg=#1e1e2e,bg=#fab387]#I#[fg=#fab387,bg=#1e1e2e]' #!important
 
 
 # -- tpm -----------------------------------------------------------------------

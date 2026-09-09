@@ -1,3 +1,4 @@
 # Agent accounts share terminal ergonomics without workstation-only commands.
 DOTFILES_ZSH_PERSONAL=false
-ZSH_THEME=robbyrussell
+ZSH_THEME=''
+DOTFILES_ZSH_DIR_COLOR=cyan

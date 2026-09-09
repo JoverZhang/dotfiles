@@ -63,7 +63,7 @@ if [ -z "$ZSH_THEME" ]; then
   }
 
   setopt prompt_subst
-  PROMPT='$(prompt_error)%B%F{magenta}%c%B%F{green}${vcs_info_msg_0_}%B %F{cyan}➜%{$reset_color%} '
+  PROMPT='$(prompt_error)%B%F{${DOTFILES_ZSH_DIR_COLOR:-magenta}}%c%B%F{green}${vcs_info_msg_0_}%B %F{cyan}➜%{$reset_color%} '
 
   autoload -U add-zsh-hook
   add-zsh-hook precmd theme_precmd

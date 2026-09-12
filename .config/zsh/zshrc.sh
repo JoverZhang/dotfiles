@@ -155,7 +155,13 @@ fi
 if [[ "$DOTFILES_ZSH_PERSONAL" == true ]]; then
   source "$ZSH_ROOT/personal.zsh"
 fi
-# Account-specific environment and aliases, selected by yadm alternates.
+alias cdr='grt'
+alias edit-zsh='${EDITOR:-vim} ~/.config/zsh/zshrc.sh'
+alias reload-zsh='exec zsh'
+alias omz-update='omz update'
+alias omz-reload='omz reload'
+
+# Private machine-specific environment and aliases; ignored by yadm.
 [[ -r "$ZSH_ROOT/local.zsh" ]] && source "$ZSH_ROOT/local.zsh"
 path=("$HOME/.local/bin" $path)
 typeset -U path

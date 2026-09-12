@@ -56,6 +56,11 @@ yadm bootstrap
 
 ## Use and Update
 
+Keep machine-specific environment variables and aliases in
+`~/.config/zsh/local.zsh`, a private regular file ignored by yadm. It is loaded
+after the shared and optional personal configuration. Create it if needed;
+yadm does not provide or synchronize it.
+
 Start a new zsh session with `exec zsh`, then run `tmux` when needed.
 Antidote installs the zsh plugins on the first interactive startup. In tmux,
 press `Ctrl-A`, then `I` to install plugins with TPM.

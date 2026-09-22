@@ -420,6 +420,16 @@ bind C-h select-pane -L
 bind C-l select-pane -R
 bind C-k select-pane -U
 bind C-j select-pane -D
+
+# one-shot notification when this pane next returns to a zsh prompt
+bind-key N if-shell -F -t '#{pane_id}' '#{@notify_on_prompt}' {
+  set-option -pqu @notify_on_prompt
+  display-message 'notification cancelled: #{pane_id}'
+} {
+  set-option -p @notify_on_prompt 1
+  display-message 'notification armed: #{pane_id}'
+}
+
 # pane split
 bind v split-pane -h -c "#{pane_current_path}"
 bind s split-pane -v -c "#{pane_current_path}"
@@ -561,6 +571,7 @@ set -g @mocha_directory_budget '#{e|-:#{client_width},#{e|+:#{n:#{W: #W #I      
 set -g @mocha_status_directory '#[fg=#f5e0dc,bg=#1e1e2e]#[fg=#11111b,bg=#f5e0dc] #[fg=#cdd6f4,bg=#313244] #{=/#{e|-:#{E:@mocha_directory_budget},6}/…:#{b:pane_current_path}} #[fg=#313244,bg=#1e1e2e] '
 set -g @mocha_status_battery '#[fg=#b4befe,bg=#1e1e2e]#[fg=#11111b,bg=#b4befe]#{?#{==:#{@battery_status},󰂄},󰂄,#{?#{>=:#{@battery_percentage},90},󰁹,#{?#{>=:#{@battery_percentage},80},󰂁,#{?#{>=:#{@battery_percentage},70},󰁿,#{?#{>=:#{@battery_percentage},60},󰁾,#{?#{>=:#{@battery_percentage},50},󰁽,#{?#{>=:#{@battery_percentage},40},󰁼,#{?#{>=:#{@battery_percentage},30},󰁻,󰁺}}}}}}}} #[fg=#cdd6f4,bg=#313244] #{@battery_percentage}#[fg=#313244,bg=#1e1e2e] '
 set -g @mocha_status_date_time '#[fg=#74c7ec,bg=#1e1e2e]#[fg=#11111b,bg=#74c7ec]󰃰 #[fg=#cdd6f4,bg=#313244] %H:%M#[fg=#313244,bg=#1e1e2e] '
+set -g @mocha_status_notify_armed '#{P:#{?@notify_on_prompt, 󰂚#{pane_index},}}'
 set -g status-position bottom #!important
 set -g status-left-length 100 #!important
 set -g status-right-length 1000 #!important
@@ -574,8 +585,8 @@ set -g status-interval 1 #!important
 set -g @mocha_bell_lit '#{&&:#{window_bell_flag},#{e|%:#(date +%%s),2}}'
 set -g @mocha_tab_bg '#{?#{E:@mocha_bell_lit},#f9e2af,#313244}'
 set -g @mocha_tab_fg '#{?#{E:@mocha_bell_lit},#1e1e2e,#cdd6f4}'
-set -g window-status-format '#[fg=#{E:@mocha_tab_bg},bg=#1e1e2e]#[fg=#{E:@mocha_tab_fg},bg=#{E:@mocha_tab_bg}] #W#{?window_bell_flag, 󰂞,}#{?window_zoomed_flag,#[fg=#{?#{E:@mocha_bell_lit},#d20f39,#f9e2af}] 󰁌#[fg=#{E:@mocha_tab_fg}],}#[fg=#89b4fa,bg=#{E:@mocha_tab_bg}] █#[fg=#313244,bg=#89b4fa]#I#[fg=#89b4fa,bg=#1e1e2e]' #!important
-set -g window-status-current-format '#[fg=#1e1e2e,bg=#1e1e2e]#[fg=#cdd6f4,bg=#1e1e2e] #W#{?window_bell_flag, 󰂞,}#{?window_zoomed_flag,#[fg=#f9e2af] 󰁌#[fg=#cdd6f4],}#[fg=#fab387,bg=#1e1e2e] █#[fg=#1e1e2e,bg=#fab387]#I#[fg=#fab387,bg=#1e1e2e]' #!important
+set -g window-status-format '#[fg=#{E:@mocha_tab_bg},bg=#1e1e2e]#[fg=#{E:@mocha_tab_fg},bg=#{E:@mocha_tab_bg}] #W#{E:@mocha_status_notify_armed}#{?window_bell_flag, 󰂞,}#{?window_zoomed_flag,#[fg=#{?#{E:@mocha_bell_lit},#d20f39,#f9e2af}] 󰁌#[fg=#{E:@mocha_tab_fg}],}#[fg=#89b4fa,bg=#{E:@mocha_tab_bg}] █#[fg=#313244,bg=#89b4fa]#I#[fg=#89b4fa,bg=#1e1e2e]' #!important
+set -g window-status-current-format '#[fg=#1e1e2e,bg=#1e1e2e]#[fg=#cdd6f4,bg=#1e1e2e] #W#{E:@mocha_status_notify_armed}#{?window_bell_flag, 󰂞,}#{?window_zoomed_flag,#[fg=#f9e2af] 󰁌#[fg=#cdd6f4],}#[fg=#fab387,bg=#1e1e2e] █#[fg=#1e1e2e,bg=#fab387]#I#[fg=#fab387,bg=#1e1e2e]' #!important
 
 
 # -- tpm -----------------------------------------------------------------------

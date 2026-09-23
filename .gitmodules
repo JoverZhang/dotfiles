@@ -1,7 +1,3 @@
-[submodule ".config/nvim"]
-	path = .config/nvim
-	url = https://github.com/JoverZhang/neovim-config.git
-	pushurl = git@github.com:JoverZhang/neovim-config.git
 [submodule ".config/zsh/zsh-file-manager"]
 	path = .config/zsh/zsh-file-manager
 	url = https://github.com/JoverZhang/zsh-file-manager.git

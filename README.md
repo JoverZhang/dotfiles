@@ -61,6 +61,30 @@ Keep machine-specific environment variables and aliases in
 after the shared and optional personal configuration. Create it if needed;
 yadm does not provide or synchronize it.
 
+Neovim is tracked directly by yadm in `~/.config/nvim`. For manual Minuet
+suggestions, set `MINUET_OPENAI_CHAT_COMPLETIONS_URL` to the full
+`/chat/completions` URL and `MINUET_OPENAI_API_KEY` to the corresponding key in
+your private shell environment before starting Neovim. The backend must accept
+the `gpt-6-luna` model name and `reasoning_effort: none`. In Insert mode,
+`Alt-Y` requests an append-only suggestion; in Normal mode, `Alt-Y` or
+`Space m p` predicts an edit that can replace or delete text. `Tab` applies a
+visible suggestion in either mode and keeps its usual behavior otherwise.
+`Space m a` applies a Normal-mode edit, `Space m d` dismisses it, and the
+statusline shows a spinner followed by the result and last edit duration.
+`Space m v` opens the Markdown side preview.
+
+On an existing checkout, local files inside the former Neovim submodule path
+can block the first pull of this change. Preserve that directory, then pull:
+
+```bash
+backup_dir=$(mktemp -d "${TMPDIR:-/tmp}/nvim-before-yadm.XXXXXX")
+mv "$HOME/.config/nvim" "$backup_dir/"
+yadm pull --ff-only
+```
+
+Review the saved `"$backup_dir/nvim"` before removing it. Future updates to
+the Neovim configuration arrive with ordinary `yadm pull` commands.
+
 Start a new zsh session with `exec zsh`, then run `tmux` when needed.
 Antidote installs the zsh plugins on the first interactive startup. In tmux,
 press `Ctrl-A`, then `I` to install plugins with TPM.

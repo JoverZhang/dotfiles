@@ -636,8 +636,12 @@ set -g @plugin 'tmux-plugins/tmux-resurrect'
 set -g @resurrect-save 'M-s'
 set -g @resurrect-restore 'M-r'
 
-#set -g @plugin 'tmux-plugins/tmux-continuum'
-#set -g @continuum-restore 'on'
+# Set these before the plugins load so restoration is enabled on the first
+# tmux server start, regardless of plugin startup order.
+set -g @continuum-save-interval '5'
+set -g @continuum-restore 'on'
+set -g @plugin 'timvw/tmux-assistant-resurrect'
+set -g @plugin 'tmux-plugins/tmux-continuum'
 
 
 # -- custom variables ----------------------------------------------------------

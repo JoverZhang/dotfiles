@@ -63,7 +63,7 @@ if [ -z "$ZSH_THEME" ]; then
   }
 
   setopt prompt_subst
-  PROMPT='$(prompt_error)%B%F{magenta}%c%B%F{green}${vcs_info_msg_0_}%B %F{cyan}➜%{$reset_color%} '
+  PROMPT='$(prompt_error)%B%F{${DOTFILES_ZSH_DIR_COLOR:-magenta}}%c%B%F{green}${vcs_info_msg_0_}%B %F{cyan}➜%{$reset_color%} '
 
   autoload -U add-zsh-hook
   add-zsh-hook precmd theme_precmd
@@ -155,7 +155,13 @@ fi
 if [[ "$DOTFILES_ZSH_PERSONAL" == true ]]; then
   source "$ZSH_ROOT/personal.zsh"
 fi
-# Account-specific environment and aliases, selected by yadm alternates.
+alias cdr='grt'
+alias edit-zsh='${EDITOR:-vim} ~/.config/zsh/zshrc.sh'
+alias reload-zsh='exec zsh'
+alias omz-update='omz update'
+alias omz-reload='omz reload'
+
+# Private machine-specific environment and aliases; ignored by yadm.
 [[ -r "$ZSH_ROOT/local.zsh" ]] && source "$ZSH_ROOT/local.zsh"
 path=("$HOME/.local/bin" $path)
 typeset -U path
@@ -165,4 +171,35 @@ typeset -U path
 if [[ -o zle && -t 0 && -t 1 ]] && (( $+commands[navi] )); then
   eval "$(navi widget zsh)"
 fi
+
+# Notify once when an armed tmux pane returns to the zsh prompt.
+_dotfiles_tmux_notify_precmd() {
+  [[ -n ${TMUX_PANE-} ]] || return 0
+
+  local armed target
+  armed=$(command tmux show-options -pqv -t "$TMUX_PANE" @notify_on_prompt 2>/dev/null)
+  [[ $armed == 1 ]] || return 0
+
+  command tmux set-option -pqu -t "$TMUX_PANE" @notify_on_prompt 2>/dev/null
+  target=$(command tmux display-message -p -t "$TMUX_PANE" '#S:#I.#{pane_index}' 2>/dev/null)
+  target=${target:-$TMUX_PANE}
+
+  if (( ${+commands[notify-send]} )); then
+    command notify-send -a tmux -- \
+      'tmux pane ready' "$target returned to zsh" \
+      >/dev/null 2>&1 &!
+  elif (( ${+commands[osascript]} )); then
+    command osascript -e \
+      "display notification \"Pane ${TMUX_PANE} returned to zsh\" with title \"tmux pane ready\"" \
+      >/dev/null 2>&1 &!
+  fi
+
+  # Feed tmux's monitor-bell so the window tab uses its bell styling.
+  print -n $'\a'
+  return 0
+}
+
+autoload -Uz add-zsh-hook
+add-zsh-hook precmd _dotfiles_tmux_notify_precmd
+
 return 0

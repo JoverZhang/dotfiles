@@ -152,6 +152,76 @@ if [[ -o zle && -t 0 && -t 1 ]]; then
   bindkey '^F' ranger-cd-widget
 fi
 
+# Transfer clipboard files through Kitty outside tmux, then reattach to main.
+getx() {
+  [[ -n $TMUX ]] || {
+    echo 'getx: tmux required' >&2
+    return 1
+  }
+  tmux delete-buffer -b getx 2>/dev/null
+  tmux detach-client -E '
+    dir="/tmp/getx-$(id -u)"
+    if mkdir -p -m 700 "$dir" && f=$(mktemp "$dir/XXXXXXXX"); then
+      if kitten clipboard -g -m "*/*" "$f" && [ -s "$f" ]; then
+        mime=$(file -b --mime-type "$f")
+        case "$mime" in
+          image/png) ext=png ;;
+          image/jpeg) ext=jpg ;;
+          image/tiff) ext=tiff ;;
+          image/webp) ext=webp ;;
+          image/gif) ext=gif ;;
+          application/pdf) ext=pdf ;;
+          text/*) ext=txt ;;
+          *) ext=bin ;;
+        esac
+        mv "$f" "$f.$ext" && tmux set-buffer -b getx "$f.$ext"
+      else
+        rm -f "$f"
+      fi
+    fi
+    exec tmux attach -t main
+  '
+  sleep 0.5
+  tmux show-buffer -b getx 2>/dev/null && echo || {
+    echo 'getx: clipboard read failed' >&2
+    return 1
+  }
+}
+
+getx-from() {
+  [[ -n $TMUX ]] || {
+    echo 'getx-from: tmux required' >&2
+    return 1
+  }
+  (( $# == 1 )) || {
+    echo 'Usage: getx-from <file>' >&2
+    return 2
+  }
+  local file_path=${1:A}
+  [[ -f $file_path && -r $file_path ]] || {
+    echo "getx-from: invalid file: $file_path" >&2
+    return 1
+  }
+  tmux set-buffer -b getx-source -- "$file_path" || return 1
+  tmux detach-client -E '
+    f=$(tmux show-buffer -b getx-source)
+    kitten clipboard "$f"
+    exec tmux attach -t main
+  '
+}
+
+getx-clean() {
+  [[ -n $TMUX ]] || {
+    echo 'getx-clean: tmux required' >&2
+    return 1
+  }
+  local dir="/tmp/getx-$(id -u)"
+  [[ -d $dir && ! -L $dir ]] || return 0
+  command rm -rf -- "$dir" || return 1
+  tmux delete-buffer -b getx 2>/dev/null
+  echo "getx-clean: cleaned $dir"
+}
+
 if [[ "$DOTFILES_ZSH_PERSONAL" == true ]]; then
   source "$ZSH_ROOT/personal.zsh"
 fi

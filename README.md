@@ -66,6 +66,21 @@ Antidote installs the zsh plugins on the first interactive startup. In tmux,
 press `Ctrl-A`, then `I` to install plugins with TPM.
 `yadm status --short` shows local changes and is empty after a clean installation.
 
+In Kitty, use the shared clipboard helpers from inside tmux (`kitten` and `file`
+must be on `PATH`):
+
+```zsh
+getx                         # save clipboard contents and print the file path
+getx-from "/path/to/file"    # copy a readable file to the clipboard
+getx-clean                   # remove files saved by getx
+```
+
+`getx` saves nonempty clipboard contents in `/tmp/getx-$(id -u)/` with a suffix
+chosen from the detected MIME type. `getx` and `getx-from` temporarily detach the
+current tmux client to access Kitty's clipboard, then reattach to the `main`
+session; that session must exist. These helpers are also loaded by the Agent
+profile.
+
 To update dotfiles and synchronize their recorded framework versions:
 
 ```bash

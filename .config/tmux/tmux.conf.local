@@ -538,6 +538,7 @@ bind-key -n M-c display-popup -E -w 80% -h 75% "ccmux"
 bind-key -n M-t display-menu -T 'Tmux Toolbox' -x C -y C \
   'New window' c 'new-window -c "#{pane_current_path}"' \
   'Choose window / session' w 'choose-tree -Zw' \
+  'Move window to session...' m 'run-shell -b "bash ~/.config/tmux/move-window-to-session.sh ##{q:client_name} ##{q:session_id} ##{q:window_id}"' \
   'New session' n 'command-prompt -p "Session name:" "new-session -s %%"' \
   'Rename window' r 'command-prompt -I "#W" "rename-window %%"' \
   'Rename session' R 'command-prompt -I "#S" "rename-session %%"' \

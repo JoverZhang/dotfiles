@@ -555,7 +555,8 @@ bind-key -n M-t display-menu -T 'Tmux Toolbox' -x C -y C \
   'Close pane' x 'confirm-before -p "Close pane #P? (y/n)" kill-pane'
 
 # Detach the popup client to keep its shell and programs running between visits.
-bind-key -n M-n if-shell -F '#{==:#{session_name},notes}' \
+unbind-key -nq M-n
+bind-key -n M-m if-shell -F '#{==:#{session_name},notes}' \
   'detach-client' \
   'display-popup -E -w 90% -h 90% -d "#{pane_current_path}" "tmux new-session -A -s notes"'
 bind-key C-f run-shell 'tmux display-popup -E -w 90% -h 85% -e TMUX_PICKER_CLIENT=#{q:client_name} "bash ~/.config/tmux/window-picker.sh"'
